@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>حمام القدس — الإدارة</title>
+  <style>
+    :root{
+      --bg:#0b1020; --muted:#93a4c7; --text:#e8eefc;
+      --ok:#2dd4bf; --warn:#fbbf24; --bad:#ef4444;
+      --border:rgba(255,255,255,.08); --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--text); min-height:100vh;}
+    header{max-width:1100px;margin:0 auto;padding:18px 18px 6px}
+    h1{margin:0 0 6px;font-size:22px;font-weight:900}
+    .sub{color:var(--muted);font-size:13px;line-height:1.7}
+    .wrap{max-width:1100px;margin:0 auto;padding:12px 18px 24px}
+    .grid{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:12px}
+    @media (max-width:1100px){.grid{grid-template-columns:repeat(3,minmax(190px,1fr));}}
+    @media (max-width:760px){.grid{grid-template-columns:repeat(2,minmax(170px,1fr));}}
+    @media (max-width:420px){.grid{grid-template-columns:1fr;}}
+    .card{
+      background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:14px;
+    }
+    .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .room-title{font-weight:900}
+    .badge{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted);background:rgba(255,255,255,.03);white-space:nowrap}
+    .badge.free{color:#d1fae5;border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.10)}
+    .badge.busy{color:#cffafe;border-color:rgba(45,212,191,.35);background:rgba(45,212,191,.10)}
+    .timer{
+      margin-top:10px; font-variant-numeric:tabular-nums; font-size:28px; font-weight:900; letter-spacing:.5px;
+      padding:8px 10px; border-radius:12px; border:1px solid var(--border); background:rgba(0,0,0,.18);
+      text-align:center; direction:ltr;
+    }
+    .timer.normal{color:var(--ok)} .timer.warn{color:var(--warn)}
+    .timer.over{color:var(--bad);border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08)}
+    .meta{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.7}
+    .meta b{color:var(--text);font-weight:900}
+
+    .price{
+      margin-top:10px;
+      padding:10px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:rgba(0,0,0,.12);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-variant-numeric: tabular-nums;
+    }
+    .price .lbl{color:var(--muted); font-size:12px; font-weight:900;}
+    .price .val{color:var(--text); font-size:16px; font-weight:1000; direction:ltr;}
+
+    .btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+    button{
+      appearance:none;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);
+      padding:8px 10px;border-radius:12px;cursor:pointer;font-weight:800;font-size:13px;font-family:inherit
+    }
+    button:hover{background:rgba(255,255,255,.08)}
+    button.primary{border-color:rgba(45,212,191,.45);background:rgba(45,212,191,.12)}
+    button.danger{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.12)}
+    button.ghost{background:transparent}
+
+    dialog{border:1px solid var(--border);border-radius:16px;background:#0f1733;color:var(--text);box-shadow:var(--shadow);width:min(520px,calc(100% - 22px))}
+    dialog::backdrop{background:rgba(0,0,0,.55)}
+    .dlg-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 14px 8px;border-bottom:1px solid var(--border)}
+    .dlg-title{font-weight:900}
+    .dlg-b{padding:14px}
+    label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+    input[type="time"], input[type="number"]{
+      width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);
+      background:rgba(255,255,255,.04);color:var(--text);font-size:14px;
+    }
+    input[type="time"]{direction:ltr}
+    .hint{color:var(--muted);font-size:12px;margin-top:8px;line-height:1.6}
+    .dlg-actions{display:flex;gap:8px;justify-content:flex-start;margin-top:12px;flex-wrap:wrap}
+    .foot{margin-top:12px;color:var(--muted);font-size:12px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>حمام القدس — الإدارة</h1>
+  <div class="sub">
+    المدة القياسية: ساعة واحدة. قبل انتهاء الساعة: عدّ تنازلي. بعد الساعة: تجاوز باللون الأحمر (+وقت إضافي).<br>
+    التسعير: <b>السعر الأساسي = عدد الأشخاص × 400 دج</b> (من 1 إلى 4). بعد الساعة: كل ربع ساعة إضافية <b>+100 دج</b>.
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="grid" class="grid"></div>
+  <div class="foot" id="syncStatus">...</div>
+</div>
+
+<dialog id="dlgStart">
+  <div class="dlg-h">
+    <div class="dlg-title" id="dlgStartTitle">بدء</div>
+    <button class="ghost" id="dlgStartClose">إغلاق</button>
+  </div>
+  <div class="dlg-b">
+    <div class="hint">
+      أدخل عدد الأشخاص (1–4) واختر طريقة البدء.
+    </div>
+
+    <div style="margin-top:12px;">
+      <label for="persons">عدد الأشخاص (1 إلى 4)</label>
+      <input id="persons" type="number" min="1" max="4" step="1" value="1" />
+      <div class="hint">لن يُسمح بأكثر من 4 أشخاص.</div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <label for="startTime">وقت يدوي (HH:MM)</label>
+      <input id="startTime" type="time" step="60" />
+      <div class="hint">إذا تركته فارغًا استخدم “ابدأ الآن”.</div>
+    </div>
+
+    <div class="dlg-actions">
+      <button id="btnStartNow" class="primary">ابدأ الآن</button>
+      <button id="btnStartManual" class="primary">ابدأ بالوقت</button>
+    </div>
+  </div>
+</dialog>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+  // ضع إعدادات مشروعك هنا
+  const firebaseConfig = {
+  apiKey: "AIzaSyBGHRhM7iU8EEgBQGrR67uDXme7Ko94v4c",
+  authDomain: "hammam-4430d.firebaseapp.com",
+  projectId: "hammam-4430d",
+  storageBucket: "hammam-4430d.firebasestorage.app",
+  messagingSenderId: "501453146862",
+  appId: "1:501453146862:web:1f4b0e5137fa3c235701ff",
+  measurementId: "G-2FW2V6FHHL"
+};
+
+  const ONE_HOUR_MS = 60 * 60 * 1000;
+  const QUARTER_MS = 15 * 60 * 1000;
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const stateRef = doc(db, "hamam", "state");
+
+  const grid = document.getElementById("grid");
+  const syncStatus = document.getElementById("syncStatus");
+
+  const dlgStart = document.getElementById("dlgStart");
+  const dlgStartTitle = document.getElementById("dlgStartTitle");
+  const startTimeInput = document.getElementById("startTime");
+  const personsInput = document.getElementById("persons");
+  const btnStartNow = document.getElementById("btnStartNow");
+  const btnStartManual = document.getElementById("btnStartManual");
+  const dlgStartClose = document.getElementById("dlgStartClose");
+
+  let rooms = [];
+  let startTargetRoomId = null;
+
+  function defaultRooms(){
+    return Array.from({length:5}, (_,i)=>({ id:i+1, status:"FREE", startMs:null, persons:null }));
+  }
+
+  function pad2(n){ return String(n).padStart(2,"0"); }
+
+  function fmtHMS(ms){
+    const s = Math.max(0, Math.floor(ms/1000));
+    const hh = Math.floor(s/3600);
+    const mm = Math.floor((s%3600)/60);
+    const ss = s%60;
+    return `${pad2(hh)}:${pad2(mm)}:${pad2(ss)}`;
+  }
+
+  function fmtDateTime(ms){
+    const d = new Date(ms);
+    const yyyy = d.getFullYear();
+    const MM = pad2(d.getMonth()+1);
+    const dd = pad2(d.getDate());
+    const hh = pad2(d.getHours());
+    const mm = pad2(d.getMinutes());
+    return `${yyyy}-${MM}-${dd} ${hh}:${mm}`;
+  }
+
+  function todayWithTime(timeHHMM){
+    const [hh, mm] = timeHHMM.split(":").map(x => parseInt(x,10));
+    const now = new Date();
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, 0, 0);
+    return d.getTime();
+  }
+
+  function clampPersons(x){
+    const n = parseInt(x, 10);
+    if(Number.isNaN(n)) return 1;
+    return Math.min(4, Math.max(1, n));
+  }
+
+  // السعر = (عدد الأشخاص * 400) + (كل ربع ساعة بعد الساعة +100)
+  function computePriceDZD(room, nowMs){
+    if(room.status !== "OCCUPIED" || !room.startMs) return 0;
+
+    const persons = clampPersons(room.persons ?? 1);
+    const elapsed = nowMs - room.startMs;
+
+    const base = persons * 400;
+
+    const over = Math.max(0, elapsed - ONE_HOUR_MS);
+    const quarters = Math.ceil(over / QUARTER_MS); // 0 قبل التجاوز، 1 عند أي تجاوز حتى 15 دقيقة، إلخ
+    const extra = quarters * 100;
+
+    return base + extra;
+  }
+
+  function computeRoomDisplay(room, nowMs){
+    if(room.status === "FREE" || !room.startMs){
+      return {
+        badgeClass:"free",
+        badgeText:"فارغة",
+        timerText:"—",
+        timerClass:"normal",
+        meta:"لا يوجد استخدام حاليًا."
+      };
+    }
+
+    const elapsed = nowMs - room.startMs;
+
+    if(elapsed < ONE_HOUR_MS){
+      const remaining = ONE_HOUR_MS - elapsed;
+      const timerClass = remaining <= 10*60*1000 ? "warn" : "normal";
+      const persons = clampPersons(room.persons ?? 1);
+      return {
+        badgeClass:"busy",
+        badgeText:"مشغولة",
+        timerText: fmtHMS(remaining),
+        timerClass,
+        meta: `البداية: <b>${fmtDateTime(room.startMs)}</b><br>المتبقي: <b>${fmtHMS(remaining)}</b><br>عدد الأشخاص: <b>${persons}</b>`
+      };
+    } else {
+      const over = elapsed - ONE_HOUR_MS;
+      const persons = clampPersons(room.persons ?? 1);
+      return {
+        badgeClass:"busy",
+        badgeText:"مشغولة (تجاوز)",
+        timerText: `+${fmtHMS(over)}`,
+        timerClass:"over",
+        meta: `البداية: <b>${fmtDateTime(room.startMs)}</b><br>تمت ساعة كاملة: <b>01:00:00</b><br>التجاوز: <b style="color:var(--bad);font-weight:900">+${fmtHMS(over)}</b><br>عدد الأشخاص: <b>${persons}</b>`
+      };
+    }
+  }
+
+  async function ensureStateDoc(){
+    const snap = await getDoc(stateRef);
+    if(!snap.exists()){
+      await setDoc(stateRef, { rooms: defaultRooms(), updatedAt: Date.now() });
+    }
+  }
+
+  async function writeRooms(newRooms){
+    await setDoc(stateRef, {
+      rooms: newRooms,
+      updatedAt: Date.now(),
+      updatedAtServer: serverTimestamp()
+    }, { merge: true });
+  }
+
+  function render(){
+    const nowMs = Date.now();
+    grid.innerHTML = "";
+
+    for(const room of rooms){
+      const disp = computeRoomDisplay(room, nowMs);
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const priceHtml = (room.status === "OCCUPIED" && room.startMs)
+        ? `
+          <div class="price">
+            <div class="lbl">السعر الحالي</div>
+            <div class="val">${computePriceDZD(room, nowMs)} دج</div>
+          </div>
+        `
+        : ``;
+
+      card.innerHTML = `
+        <div class="row">
+          <div class="room-title">غرفة ${room.id}</div>
+          <div class="badge ${disp.badgeClass}">${disp.badgeText}</div>
+        </div>
+
+        <div class="timer ${disp.timerClass}">${disp.timerText}</div>
+        <div class="meta">${disp.meta}</div>
+        ${priceHtml}
+
+        <div class="btns">
+          ${room.status === "FREE"
+            ? `<button class="primary" data-action="start" data-room="${room.id}">بدء</button>`
+            : `<button class="danger" data-action="end" data-room="${room.id}">تحرير</button>`
+          }
+          <button class="ghost" data-action="details" data-room="${room.id}">تفاصيل</button>
+        </div>
+      `;
+
+      grid.appendChild(card);
+    }
+
+    syncStatus.textContent = `آخر تحديث للواجهة: ${new Date().toLocaleTimeString("ar-DZ")}`;
+  }
+
+  function openStartDialog(roomId){
+    startTargetRoomId = roomId;
+    dlgStartTitle.textContent = `بدء — غرفة ${roomId}`;
+    startTimeInput.value = "";
+    personsInput.value = "1";
+    dlgStart.showModal();
+  }
+
+  async function startRoom(roomId, startMs){
+    const idx = rooms.findIndex(r => r.id === roomId);
+    if(idx < 0) return;
+
+    const persons = clampPersons(personsInput.value || "1");
+    const r = {...rooms[idx], status:"OCCUPIED", startMs, persons};
+
+    const newRooms = rooms.slice();
+    newRooms[idx] = r;
+
+    await writeRooms(newRooms);
+  }
+
+  async function endRoom(roomId){
+    const idx = rooms.findIndex(r => r.id === roomId);
+    if(idx < 0) return;
+
+    const r0 = rooms[idx];
+    if(r0.status !== "OCCUPIED" || !r0.startMs) return;
+
+    const r = {...r0, status:"FREE", startMs:null, persons:null};
+    const newRooms = rooms.slice();
+    newRooms[idx] = r;
+
+    await writeRooms(newRooms);
+  }
+
+  function showDetails(roomId){
+    const room = rooms.find(r => r.id === roomId);
+    if(!room) return;
+
+    if(room.status === "FREE"){
+      alert(`الغرفة ${roomId} فارغة.`);
+      return;
+    }
+
+    const nowMs = Date.now();
+    const elapsed = nowMs - room.startMs;
+    const over = Math.max(0, elapsed - ONE_HOUR_MS);
+    const remaining = Math.max(0, ONE_HOUR_MS - elapsed);
+    const persons = clampPersons(room.persons ?? 1);
+    const price = computePriceDZD(room, nowMs);
+
+    const msg =
+      `غرفة ${roomId} — مشغولة\n` +
+      `البداية: ${fmtDateTime(room.startMs)}\n` +
+      `عدد الأشخاص: ${persons}\n` +
+      `السعر الحالي: ${price} دج\n` +
+      `الوقت المنقضي: ${fmtHMS(elapsed)}\n` +
+      (elapsed < ONE_HOUR_MS
+        ? `المتبقي (حتى ساعة): ${fmtHMS(remaining)}`
+        : `التجاوز: +${fmtHMS(over)}`
+      );
+
+    alert(msg);
+  }
+
+  grid.addEventListener("click", async (e) => {
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    const action = btn.dataset.action;
+    const roomId = parseInt(btn.dataset.room, 10);
+    if(!action || !roomId) return;
+
+    try{
+      if(action === "start") openStartDialog(roomId);
+      if(action === "end") await endRoom(roomId);
+      if(action === "details") showDetails(roomId);
+    }catch(err){
+      alert("حدث خطأ أثناء الحفظ. تحقق من الاتصال وقواعد Firestore.");
+      console.error(err);
+    }
+  });
+
+  dlgStartClose.addEventListener("click", () => dlgStart.close());
+
+  btnStartNow.addEventListener("click", async () => {
+    if(!startTargetRoomId) return;
+    try{
+      await startRoom(startTargetRoomId, Date.now());
+      dlgStart.close();
+    }catch(err){
+      alert("فشل البدء. راجع قواعد Firestore والاتصال.");
+      console.error(err);
+    }
+  });
+
+  btnStartManual.addEventListener("click", async () => {
+    if(!startTargetRoomId) return;
+
+    const t = startTimeInput.value;
+    if(!t){
+      alert("الرجاء إدخال الوقت (HH:MM) أو اختر “ابدأ الآن”.");
+      return;
+    }
+
+    const startMs = todayWithTime(t);
+    if(startMs > Date.now()){
+      alert("الوقت المُدخل في المستقبل. صحّح الوقت أو استخدم “ابدأ الآن”.");
+      return;
+    }
+
+    try{
+      await startRoom(startTargetRoomId, startMs);
+      dlgStart.close();
+    }catch(err){
+      alert("فشل البدء بالوقت. راجع قواعد Firestore.");
+      console.error(err);
+    }
+  });
+
+  (async function main(){
+    await signInAnonymously(auth);
+    await ensureStateDoc();
+
+    onSnapshot(stateRef, (snap) => {
+      const data = snap.data();
+      rooms = (data?.rooms && Array.isArray(data.rooms) && data.rooms.length === 5) ? data.rooms : defaultRooms();
+      render();
+    }, (err) => {
+      console.error(err);
+      syncStatus.textContent = "تعذر الاتصال بـ Firestore. راجع الإنترنت والقواعد.";
+    });
+
+    setInterval(render, 1000);
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>حمام القدس — شاشة العرض</title>
+  <style>
+    :root{
+      --bg:#0b1020; --muted:#93a4c7; --text:#e8eefc;
+      --ok:#2dd4bf; --warn:#fbbf24; --bad:#ef4444;
+      --border:rgba(255,255,255,.08); --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);min-height:100vh}
+    header{max-width:1600px;margin:0 auto;padding:18px 24px 6px}
+    h1{margin:0;font-size:34px;font-weight:1000}
+    .sub{color:var(--muted);font-size:14px;margin-top:6px}
+
+    /* تخطيط جديد: محتوى + شريط يمين */
+    .layout{
+      max-width:1600px;
+      margin: 0 auto;
+      padding: 12px 24px 10px;
+      display: grid;
+      grid-template-columns: 1fr 360px; /* محتوى + يمين */
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 1100px){
+      .layout{ grid-template-columns: 1fr; }
+      .sidebar{ order:-1; } /* في الشاشات الصغيرة يظهر أعلى */
+    }
+
+    .section{
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+    .section-title{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin: 0 0 10px 0;
+      color: var(--text);
+      font-weight: 1000;
+      font-size: 18px;
+    }
+    .count{
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.12);
+      padding: 4px 8px;
+      border-radius: 999px;
+    }
+
+    .grid{display:grid;grid-template-columns:repeat(5,minmax(240px,1fr));gap:14px}
+    @media (max-width:1400px){.grid{grid-template-columns:repeat(3,minmax(240px,1fr));}}
+    @media (max-width:900px){.grid{grid-template-columns:repeat(2,minmax(220px,1fr));}}
+    @media (max-width:520px){.grid{grid-template-columns:1fr;}}
+
+    .card{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .room-title{font-weight:1000;font-size:20px}
+    .badge{font-size:13px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);color:var(--muted);background:rgba(255,255,255,.03)}
+    .badge.free{color:#d1fae5;border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.10)}
+    .badge.busy{color:#cffafe;border-color:rgba(45,212,191,.35);background:rgba(45,212,191,.10)}
+    .timer{
+      margin-top:12px; font-variant-numeric:tabular-nums; font-size:44px; font-weight:1100;
+      padding:10px 12px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.18);
+      text-align:center; direction:ltr;
+    }
+    .timer.normal{color:var(--ok)} .timer.warn{color:var(--warn)}
+    .timer.over{color:var(--bad);border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08)}
+    .meta{margin-top:10px;color:var(--muted);font-size:14px;line-height:1.6}
+    .meta b{color:var(--text);font-weight:1000}
+
+    .sidebar .big{
+      font-size: 22px;
+      font-weight: 1100;
+      margin: 4px 0 10px 0;
+    }
+    .panel{
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: rgba(0,0,0,.12);
+    }
+    .line{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 8px 0;
+      border-bottom:1px solid var(--border);
+    }
+    .line:last-child{border-bottom:none}
+    .label{color:var(--muted); font-size: 13px; font-weight: 800;}
+    .value{color:var(--text); font-size: 16px; font-weight: 1000; direction:ltr;}
+    .value.ar{direction:rtl}
+
+    .copyright{max-width:1600px;margin:8px auto 14px;padding:0 24px;text-align:center;color:var(--muted);font-size:14px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>حمام القدس</h1>
+  <div class="sub">شاشة العرض — الغرف الشاغرة بالأعلى والمحجوزة بالأسفل. التحديث لحظي.</div>
+</header>
+
+<div class="layout">
+  <div class="content">
+    <div class="section">
+      <div class="section-title">
+        <span>الغرف الشاغرة</span>
+        <span class="count" id="freeCount">0</span>
+      </div>
+      <div id="freeGrid" class="grid"></div>
+    </div>
+
+    <div style="height:14px"></div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>الغرف المحجوزة</span>
+        <span class="count" id="busyCount">0</span>
+      </div>
+      <div id="busyGrid" class="grid"></div>
+    </div>
+  </div>
+
+  <div class="sidebar section">
+    <div class="big">أقرب غرفة ستفرغ</div>
+    <div class="panel" id="nextPanel">
+      <div class="line">
+        <div class="label">الحالة</div>
+        <div class="value ar" id="nextStatus">—</div>
+      </div>
+      <div class="line">
+        <div class="label">الغرفة</div>
+        <div class="value ar" id="nextRoom">—</div>
+      </div>
+      <div class="line">
+        <div class="label">المتبقي حتى ساعة</div>
+        <div class="value" id="nextRemaining">—</div>
+      </div>
+      <div class="line">
+        <div class="label">وقت البداية</div>
+        <div class="value" id="nextStart">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="copyright">جميع الحقوق محفوظة</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  import { getFirestore, doc, onSnapshot, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+  const firebaseConfig = {
+  apiKey: "AIzaSyBGHRhM7iU8EEgBQGrR67uDXme7Ko94v4c",
+  authDomain: "hammam-4430d.firebaseapp.com",
+  projectId: "hammam-4430d",
+  storageBucket: "hammam-4430d.firebasestorage.app",
+  messagingSenderId: "501453146862",
+  appId: "1:501453146862:web:1f4b0e5137fa3c235701ff",
+  measurementId: "G-2FW2V6FHHL"
+};
+
+  const ONE_HOUR_MS = 60 * 60 * 1000;
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const stateRef = doc(db, "hamam", "state");
+
+  const freeGrid = document.getElementById("freeGrid");
+  const busyGrid = document.getElementById("busyGrid");
+  const freeCount = document.getElementById("freeCount");
+  const busyCount = document.getElementById("busyCount");
+
+  const nextStatus = document.getElementById("nextStatus");
+  const nextRoom = document.getElementById("nextRoom");
+  const nextRemaining = document.getElementById("nextRemaining");
+  const nextStart = document.getElementById("nextStart");
+
+  let rooms = [];
+
+  function defaultRooms(){
+    return Array.from({length:5}, (_,i)=>({ id:i+1, status:"FREE", startMs:null, persons:null }));
+  }
+
+  function pad2(n){ return String(n).padStart(2,"0"); }
+  function fmtHMS(ms){
+    const s = Math.max(0, Math.floor(ms/1000));
+    const hh = Math.floor(s/3600);
+    const mm = Math.floor((s%3600)/60);
+    const ss = s%60;
+    return `${pad2(hh)}:${pad2(mm)}:${pad2(ss)}`;
+  }
+  function fmtTime(ms){
+    const d = new Date(ms);
+    return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  }
+
+  function computeDisplay(room, nowMs){
+    if(room.status === "FREE" || !room.startMs){
+      return { badgeClass:"free", badgeText:"فارغة", timerText:"—", timerClass:"normal", meta:"لا يوجد استخدام حاليًا." };
+    }
+    const elapsed = nowMs - room.startMs;
+    if(elapsed < ONE_HOUR_MS){
+      const remaining = ONE_HOUR_MS - elapsed;
+      const timerClass = remaining <= 10*60*1000 ? "warn" : "normal";
+      return {
+        badgeClass:"busy",
+        badgeText:"محجوزة",
+        timerText: fmtHMS(remaining),
+        timerClass,
+        meta:`البداية: <b style="direction:ltr;display:inline-block">${fmtTime(room.startMs)}</b><br>المتبقي: <b style="direction:ltr;display:inline-block">${fmtHMS(remaining)}</b>`
+      };
+    } else {
+      const over = elapsed - ONE_HOUR_MS;
+      return {
+        badgeClass:"busy",
+        badgeText:"محجوزة (تجاوز)",
+        timerText: `+${fmtHMS(over)}`,
+        timerClass:"over",
+        meta:`البداية: <b style="direction:ltr;display:inline-block">${fmtTime(room.startMs)}</b><br>التجاوز: <b style="color:var(--bad);font-weight:1000;direction:ltr;display:inline-block">+${fmtHMS(over)}</b>`
+      };
+    }
+  }
+
+  function findNextToFree(nowMs){
+    // نختار أقل "متبقي" بين الغرف التي ما زالت داخل الساعة
+    const candidates = rooms
+      .filter(r => r.status === "OCCUPIED" && r.startMs)
+      .map(r => {
+        const elapsed = nowMs - r.startMs;
+        const remaining = ONE_HOUR_MS - elapsed;
+        return { r, elapsed, remaining };
+      })
+      .filter(x => x.remaining > 0);
+
+    if(candidates.length === 0) return null;
+
+    candidates.sort((a,b) => a.remaining - b.remaining);
+    return candidates[0];
+  }
+
+  function render(){
+    const nowMs = Date.now();
+    freeGrid.innerHTML = "";
+    busyGrid.innerHTML = "";
+
+    const freeRooms = rooms.filter(r => r.status === "FREE" || !r.startMs);
+    const busyRooms = rooms.filter(r => r.status === "OCCUPIED" && r.startMs);
+
+    freeCount.textContent = String(freeRooms.length);
+    busyCount.textContent = String(busyRooms.length);
+
+    for(const room of freeRooms){
+      const disp = computeDisplay(room, nowMs);
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="row">
+          <div class="room-title">غرفة ${room.id}</div>
+          <div class="badge ${disp.badgeClass}">${disp.badgeText}</div>
+        </div>
+        <div class="timer ${disp.timerClass}">${disp.timerText}</div>
+        <div class="meta">${disp.meta}</div>
+      `;
+      freeGrid.appendChild(card);
+    }
+
+    for(const room of busyRooms){
+      const disp = computeDisplay(room, nowMs);
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="row">
+          <div class="room-title">غرفة ${room.id}</div>
+          <div class="badge ${disp.badgeClass}">${disp.badgeText}</div>
+        </div>
+        <div class="timer ${disp.timerClass}">${disp.timerText}</div>
+        <div class="meta">${disp.meta}</div>
+      `;
+      busyGrid.appendChild(card);
+    }
+
+    // لوحة "أقرب غرفة ستفرغ"
+    const next = findNextToFree(nowMs);
+    if(!next){
+      nextStatus.textContent = "لا توجد غرفة ستفرغ قريبًا";
+      nextRoom.textContent = "—";
+      nextRemaining.textContent = "—";
+      nextStart.textContent = "—";
+    } else {
+      nextStatus.textContent = "ضمن الساعة (ستنتهي أولًا)";
+      nextRoom.textContent = `غرفة ${next.r.id}`;
+      nextRemaining.textContent = fmtHMS(next.remaining);
+      nextStart.textContent = fmtTime(next.r.startMs);
+    }
+  }
+
+  async function ensureStateDoc(){
+    const snap = await getDoc(stateRef);
+    if(!snap.exists()){
+      await setDoc(stateRef, { rooms: defaultRooms(), updatedAt: Date.now() });
+    }
+  }
+
+  (async function main(){
+    await signInAnonymously(auth);
+    await ensureStateDoc();
+
+    onSnapshot(stateRef, (snap) => {
+      const data = snap.data();
+      rooms = (data?.rooms && Array.isArray(data.rooms) && data.rooms.length === 5) ? data.rooms : defaultRooms();
+      render();
+    });
+
+    setInterval(render, 1000);
+  })();
+</script>
+</body>
+</html>
