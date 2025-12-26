@@ -29,7 +29,8 @@
     h1{margin:0;font-size:42px;font-weight:1100}
     .sub{color:var(--muted);font-size:16px;margin-top:6px}
 
-    /* تخطيط 3 أعمدة ثابت لعرض TV: يمين خدمات | وسط غرف | يسار أقرب غرفة + صور */
+    /* ===== تخطيط TV ثلاثي الأعمدة =====
+       يمين: خدمات | وسط: غرف | يسار: أقرب غرفة + صور */
     .layout{
       max-width:1760px;
       margin: 0 auto;
@@ -112,33 +113,10 @@
     }
     .timer.normal{color:var(--ok)} .timer.warn{color:var(--warn)}
     .timer.over{color:var(--bad);border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.10)}
-
     .meta{margin-top:10px;color:var(--muted);font-size:15px;line-height:1.7}
     .meta b{color:var(--text);font-weight:1100}
 
-    /* Panels (يسار/يمين) */
-    .big{
-      font-size: 22px;
-      font-weight: 1100;
-      margin: 4px 0 12px 0;
-    }
-    .panel{
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px;
-      background: rgba(0,0,0,.18);
-    }
-    .line{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding: 10px 0;
-      border-bottom:1px solid var(--border);
-    }
-    .line:last-child{border-bottom:none}
-    .label{color:var(--muted); font-size: 14px; font-weight: 900;}
-    .value{color:var(--text); font-size: 18px; font-weight: 1100; direction:ltr;}
-    .value.ar{direction:rtl}
-
-    /* جدول الخدمات */
+    /* يمين: جدول الخدمات */
     .services-table{
       width:100%;
       border-collapse: collapse;
@@ -166,14 +144,25 @@
       white-space: nowrap;
       min-width: 110px;
     }
-    .note{
-      margin-top:10px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.8;
-    }
 
-    /* سلايد صور: صورة واحدة تتبدل */
+    /* يسار: لوحة أقرب غرفة */
+    .panel{
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: rgba(0,0,0,.18);
+    }
+    .line{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 10px 0;
+      border-bottom:1px solid var(--border);
+    }
+    .line:last-child{border-bottom:none}
+    .label{color:var(--muted); font-size: 14px; font-weight: 900;}
+    .value{color:var(--text); font-size: 18px; font-weight: 1100; direction:ltr;}
+    .value.ar{direction:rtl}
+
+    /* سلايد صور */
     .slideshow{
       margin-top: 12px;
       border:1px solid var(--border);
@@ -206,37 +195,31 @@
 <body>
 <header>
   <h1>حمام القدس</h1>
-  <div class="sub">شاشة العرض — الغرف الشاغرة في الوسط، والخدمات يمينًا، وأقرب غرفة ستفرغ يسارًا. التحديث لحظي.</div>
+  <div class="sub">شاشة العرض — التحديث لحظي. الموسيقى تعمل بعد أول ضغطة من الريموت (Android TV).</div>
 </header>
 
 <div class="layout">
 
-  <!-- يمين: الخدمات والأسعار -->
+  <!-- ===== Right: Services ===== -->
   <aside class="right section">
-    <div class="big">الخدمات والأسعار</div>
-
+    <div class="section-title">
+      <span>الخدمات والأسعار</span>
+      <span class="count">دج</span>
+    </div>
     <table class="services-table" role="table" aria-label="الخدمات والأسعار">
       <thead>
-        <tr>
-          <th>الخدمة</th>
-          <th>السعر</th>
-        </tr>
+        <tr><th>الخدمة</th><th>السعر</th></tr>
       </thead>
       <tbody>
-        <tr><td>الدخول (للشخص)</td><td>400 دج</td></tr>
-        <tr><td>تمديد بعد الساعة (كل 15 دقيقة)</td><td>+100 دج</td></tr>
+        <tr><td>الدخول (للشخص)</td><td>400</td></tr>
+        <tr><td>تمديد بعد الساعة (كل 15 دقيقة)</td><td>+100</td></tr>
         <tr><td>ساونا</td><td>حسب الطلب</td></tr>
         <tr><td>تدليك</td><td>حسب الطلب</td></tr>
-        <tr><td>خدمات إضافية</td><td>حسب الطلب</td></tr>
       </tbody>
     </table>
-
-    <div class="note">
-      ملاحظة: عدّل الخدمات والأسعار من هذا الجدول حسب واقع حمام القدس.
-    </div>
   </aside>
 
-  <!-- الوسط: الشاغرة + المحجوزة -->
+  <!-- ===== Center: Rooms ===== -->
   <main class="center content">
     <div class="section">
       <div class="section-title">
@@ -257,9 +240,12 @@
     </div>
   </main>
 
-  <!-- يسار: أقرب غرفة ستفرغ + سلايد صور -->
+  <!-- ===== Left: Next + Slideshow ===== -->
   <aside class="left section">
-    <div class="big">أقرب غرفة ستفرغ</div>
+    <div class="section-title">
+      <span>أقرب غرفة ستفرغ</span>
+      <span class="count">ضمن الساعة</span>
+    </div>
 
     <div class="panel" id="nextPanel">
       <div class="line">
@@ -290,11 +276,17 @@
 
 <div class="copyright">جميع الحقوق محفوظة</div>
 
+<!-- ===== Background Music for Android TV ===== -->
+<audio id="bgMusic" preload="auto" loop>
+  <source src="./assets/music.mp3" type="audio/mpeg">
+</audio>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
   import { getFirestore, doc, onSnapshot, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
+  // ===== Firebase config (كما كان عندك) =====
   const firebaseConfig = {
     apiKey: "AIzaSyBGHRhM7iU8EEgBQGrR67uDXme7Ko94v4c",
     authDomain: "hammam-4430d.firebaseapp.com",
@@ -307,6 +299,24 @@
 
   const ONE_HOUR_MS = 60 * 60 * 1000;
 
+  // ===== Android TV music: يبدأ بعد أول ضغطة =====
+  const music = document.getElementById("bgMusic");
+  music.volume = 0.25; // 0..1
+  let musicStarted = false;
+
+  async function startMusicOnce(){
+    if (musicStarted) return;
+    musicStarted = true;
+    try { await music.play(); }
+    catch(e){ musicStarted = false; }
+  }
+
+  // أي زر من الريموت (OK/أسهم/Back..) يحسب تفاعل
+  document.addEventListener("keydown", startMusicOnce);
+  document.addEventListener("click", startMusicOnce);
+  window.addEventListener("load", startMusicOnce);
+
+  // ===== Firestore setup =====
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -322,7 +332,7 @@
   const nextRemaining = document.getElementById("nextRemaining");
   const nextStart = document.getElementById("nextStart");
 
-  // سلايدشو
+  // ===== Slideshow =====
   const slideImg = document.getElementById("slideImg");
   const slideCap = document.getElementById("slideCap");
   const slides = [
@@ -332,6 +342,20 @@
   ];
   let slideIndex = 0;
 
+  function startSlideshow(){
+    function show(i){
+      const s = slides[i % slides.length];
+      slideImg.src = s.src;
+      slideCap.textContent = s.cap;
+    }
+    show(slideIndex);
+    setInterval(() => {
+      slideIndex = (slideIndex + 1) % slides.length;
+      show(slideIndex);
+    }, 5000);
+  }
+
+  // ===== Rooms logic (كما كان عندك) =====
   let rooms = [];
 
   function defaultRooms(){
@@ -339,6 +363,7 @@
   }
 
   function pad2(n){ return String(n).padStart(2,"0"); }
+
   function fmtHMS(ms){
     const s = Math.max(0, Math.floor(ms/1000));
     const hh = Math.floor(s/3600);
@@ -346,6 +371,7 @@
     const ss = s%60;
     return `${pad2(hh)}:${pad2(mm)}:${pad2(ss)}`;
   }
+
   function fmtTime(ms){
     const d = new Date(ms);
     return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
@@ -353,9 +379,17 @@
 
   function computeDisplay(room, nowMs){
     if(room.status === "FREE" || !room.startMs){
-      return { badgeClass:"free", badgeText:"فارغة", timerText:"—", timerClass:"normal", meta:"لا يوجد استخدام حاليًا." };
+      return {
+        badgeClass:"free",
+        badgeText:"فارغة",
+        timerText:"—",
+        timerClass:"normal",
+        meta:"لا يوجد استخدام حاليًا."
+      };
     }
+
     const elapsed = nowMs - room.startMs;
+
     if(elapsed < ONE_HOUR_MS){
       const remaining = ONE_HOUR_MS - elapsed;
       const timerClass = remaining <= 10*60*1000 ? "warn" : "normal";
@@ -364,7 +398,8 @@
         badgeText:"محجوزة",
         timerText: fmtHMS(remaining),
         timerClass,
-        meta:`البداية: <b style="direction:ltr;display:inline-block">${fmtTime(room.startMs)}</b><br>المتبقي: <b style="direction:ltr;display:inline-block">${fmtHMS(remaining)}</b>`
+        meta:`البداية: <b style="direction:ltr;display:inline-block">${fmtTime(room.startMs)}</b><br>
+              المتبقي: <b style="direction:ltr;display:inline-block">${fmtHMS(remaining)}</b>`
       };
     } else {
       const over = elapsed - ONE_HOUR_MS;
@@ -373,7 +408,8 @@
         badgeText:"محجوزة (تجاوز)",
         timerText: `+${fmtHMS(over)}`,
         timerClass:"over",
-        meta:`البداية: <b style="direction:ltr;display:inline-block">${fmtTime(room.startMs)}</b><br>التجاوز: <b style="color:var(--bad);font-weight:1100;direction:ltr;display:inline-block">+${fmtHMS(over)}</b>`
+        meta:`البداية: <b style="direction:ltr;display:inline-block">${fmtTime(room.startMs)}</b><br>
+              التجاوز: <b style="color:var(--bad);font-weight:1100;direction:ltr;display:inline-block">+${fmtHMS(over)}</b>`
       };
     }
   }
@@ -455,26 +491,15 @@
     }
   }
 
-  function startSlideshow(){
-    function show(i){
-      const s = slides[i % slides.length];
-      slideImg.src = s.src;
-      slideCap.textContent = s.cap;
-    }
-    show(slideIndex);
-    setInterval(() => {
-      slideIndex = (slideIndex + 1) % slides.length;
-      show(slideIndex);
-    }, 5000);
-  }
-
   (async function main(){
     await signInAnonymously(auth);
     await ensureStateDoc();
 
     onSnapshot(stateRef, (snap) => {
       const data = snap.data();
-      rooms = (data?.rooms && Array.isArray(data.rooms) && data.rooms.length === 5) ? data.rooms : defaultRooms();
+      rooms = (data?.rooms && Array.isArray(data.rooms) && data.rooms.length === 5)
+        ? data.rooms
+        : defaultRooms();
       render();
     });
 
