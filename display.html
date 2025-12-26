@@ -11,7 +11,7 @@
       --ok:#2dd4bf; --warn:#fbbf24; --bad:#ef4444;
       --border:rgba(255,255,255,.08); --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius: 18px;
-      --safe: 32px;
+      --safe: 24px;
     }
     body{
     padding: var(--safe);
@@ -38,7 +38,7 @@
     .layout{
       max-width:1760px;
       margin: 0 auto;
-      padding: 14px 28px 14px;
+      padding: 10px 24px 4px;
       display: grid;
       direction: rtl;
 
@@ -193,6 +193,67 @@
       max-width:1760px;margin:10px auto 16px;padding:0 28px;
       text-align:center;color:var(--muted);font-size:14px
     }
+    /* ===== ANDROID TV 1080p PROFILE ===== */
+@media (max-width: 1920px) {
+
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 32px !important;
+  }
+
+  .sub {
+    font-size: 14px !important;
+  }
+
+  .layout {
+    max-width: 1600px;
+    grid-template-columns: 320px minmax(720px, 1fr) 320px;
+    gap: 12px;
+  }
+
+  header {
+    padding: 10px 24px 4px;
+  }
+
+  .section {
+    padding: 12px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .room-title {
+    font-size: 18px;
+  }
+
+  .timer {
+    font-size: 36px !important;
+    padding: 10px;
+  }
+
+  .badge {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  .meta {
+    font-size: 13px;
+  }
+
+  .services-table th,
+  .services-table td {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .slideshow img {
+    height: 180px;
+  }
+}
   </style>
 </head>
 
@@ -513,6 +574,7 @@
 </script>
 </body>
 </html>
+
 
 
 
