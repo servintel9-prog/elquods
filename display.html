@@ -13,7 +13,6 @@
     }
     *{box-sizing:border-box}
 
-    /* خلفية بصورة + طبقة تعتيم لرفع وضوح النص */
     body{
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
@@ -28,19 +27,27 @@
     h1{margin:0;font-size:34px;font-weight:1000}
     .sub{color:var(--muted);font-size:14px;margin-top:6px}
 
-    /* تخطيط: محتوى + شريط يمين */
+    /* تخطيط 3 أعمدة: يسار (أقرب غرفة+سلايد) | وسط (الشاغرة+المحجوزة) | يمين (الخدمات) */
     .layout{
       max-width:1600px;
       margin: 0 auto;
       padding: 12px 24px 10px;
       display: grid;
-      grid-template-columns: 1fr 360px; /* محتوى + يمين */
+      grid-template-columns: 360px 1fr 360px; /* LEFT | CENTER | RIGHT */
       gap: 14px;
       align-items: start;
+
+      /* مهم: نثبت الأعمدة بصريًا (يسار/وسط/يمين) */
+      direction: ltr;
     }
-    @media (max-width: 1100px){
-      .layout{ grid-template-columns: 1fr; }
-      .sidebar{ order:-1; }
+
+    /* على الشاشات الصغيرة: تصبح عمودية */
+    @media (max-width: 1200px){
+      .layout{
+        grid-template-columns: 1fr;
+        direction: rtl;
+      }
+      .left, .right { order: -1; }
     }
 
     .section{
@@ -49,7 +56,10 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       padding: 12px;
+      /* داخل اللوحات العربية */
+      direction: rtl;
     }
+
     .section-title{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       margin: 0 0 10px 0;
@@ -68,7 +78,7 @@
     }
 
     .grid{display:grid;grid-template-columns:repeat(5,minmax(240px,1fr));gap:14px}
-    @media (max-width:1400px){.grid{grid-template-columns:repeat(3,minmax(240px,1fr));}}
+    @media (max-width:1500px){.grid{grid-template-columns:repeat(3,minmax(240px,1fr));}}
     @media (max-width:900px){.grid{grid-template-columns:repeat(2,minmax(220px,1fr));}}
     @media (max-width:520px){.grid{grid-template-columns:1fr;}}
 
@@ -95,8 +105,8 @@
     .meta{margin-top:10px;color:var(--muted);font-size:14px;line-height:1.6}
     .meta b{color:var(--text);font-weight:1000}
 
-    /* Sidebar */
-    .sidebar .big{
+    /* Panels (يسار/يمين) */
+    .big{
       font-size: 22px;
       font-weight: 1100;
       margin: 4px 0 10px 0;
@@ -117,30 +127,61 @@
     .value{color:var(--text); font-size: 16px; font-weight: 1000; direction:ltr;}
     .value.ar{direction:rtl}
 
-    /* معرض الصور */
-    .gallery{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin-top: 12px;
+    /* جدول الخدمات */
+    .services-table{
+      width:100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius: var(--radius);
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.12);
     }
-    .gallery .img{
+    .services-table th, .services-table td{
+      padding: 10px 10px;
+      border-bottom:1px solid var(--border);
+      font-size: 14px;
+    }
+    .services-table th{
+      text-align:right;
+      color: var(--muted);
+      font-weight: 1000;
+      background: rgba(255,255,255,.03);
+    }
+    .services-table td:last-child{
+      text-align:left;
+      direction:ltr;
+      font-weight: 1100;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .note{
+      margin-top:10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    /* سلايد صور (صورة واحدة تتغير) */
+    .slideshow{
+      margin-top: 12px;
       border:1px solid var(--border);
       border-radius: var(--radius);
       overflow:hidden;
       background: rgba(0,0,0,.16);
     }
-    .gallery img{
+    .slideshow img{
       width:100%;
-      height: 140px;
+      height: 210px;
       object-fit: cover;
       display:block;
     }
-    .gallery .cap{
-      padding: 8px 10px;
+    .slideshow .cap{
+      padding: 10px 12px;
       color: var(--muted);
       font-size: 13px;
       font-weight: 900;
+      border-top:1px solid var(--border);
+      background: rgba(0,0,0,.10);
     }
 
     .copyright{
@@ -149,37 +190,19 @@
     }
   </style>
 </head>
+
 <body>
 <header>
   <h1>حمام القدس</h1>
-  <div class="sub">شاشة العرض — الغرف الشاغرة بالأعلى والمحجوزة بالأسفل. التحديث لحظي.</div>
+  <div class="sub">شاشة العرض — الغرف الشاغرة في الوسط. التحديث لحظي.</div>
 </header>
 
 <div class="layout">
-  <div class="content">
-    <div class="section">
-      <div class="section-title">
-        <span>الغرف الشاغرة</span>
-        <span class="count" id="freeCount">0</span>
-      </div>
-      <div id="freeGrid" class="grid"></div>
-    </div>
 
-    <div style="height:14px"></div>
-
-    <div class="section">
-      <div class="section-title">
-        <span>الغرف المحجوزة</span>
-        <span class="count" id="busyCount">0</span>
-      </div>
-      <div id="busyGrid" class="grid"></div>
-    </div>
-  </div>
-
-  <div class="sidebar section">
+  <!-- يسار: أقرب غرفة ستفرغ + سلايد صور -->
+  <aside class="left section">
     <div class="big">أقرب غرفة ستفرغ</div>
 
-    <!-- هذه هي اللوحة التي كان اسمها nextPanel -->
     <div class="panel" id="nextPanel">
       <div class="line">
         <div class="label">الحالة</div>
@@ -199,17 +222,59 @@
       </div>
     </div>
 
-    <div class="gallery">
-      <div class="img">
-        <img src="./assets/sauna.jpg" alt="ساونا" />
-        <div class="cap">ساونا</div>
-      </div>
-      <div class="img">
-        <img src="./assets/massage.jpg" alt="تدليك" />
-        <div class="cap">التدليك</div>
-      </div>
+    <!-- سلايدشو: صورة واحدة تتبدل -->
+    <div class="slideshow" aria-label="عرض صور متتابع">
+      <img id="slideImg" src="./assets/sauna.jpg" alt="عرض صور" />
+      <div class="cap" id="slideCap">ساونا</div>
     </div>
-  </div>
+  </aside>
+
+  <!-- الوسط: الشاغرة + المحجوزة -->
+  <main class="center content">
+    <div class="section">
+      <div class="section-title">
+        <span>الغرف الشاغرة</span>
+        <span class="count" id="freeCount">0</span>
+      </div>
+      <div id="freeGrid" class="grid"></div>
+    </div>
+
+    <div style="height:14px"></div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>الغرف المحجوزة</span>
+        <span class="count" id="busyCount">0</span>
+      </div>
+      <div id="busyGrid" class="grid"></div>
+    </div>
+  </main>
+
+  <!-- يمين: الخدمات والأسعار -->
+  <aside class="right section">
+    <div class="big">الخدمات والأسعار</div>
+
+    <table class="services-table" role="table" aria-label="الخدمات والأسعار">
+      <thead>
+        <tr>
+          <th>الخدمة</th>
+          <th>السعر</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>الدخول (للشخص)</td><td>400 دج</td></tr>
+        <tr><td>تمديد بعد الساعة (كل 15 دقيقة)</td><td>+100 دج</td></tr>
+        <tr><td>ساونا</td><td>حسب الطلب</td></tr>
+        <tr><td>تدليك</td><td>حسب الطلب</td></tr>
+        <tr><td>خدمات إضافية</td><td>حسب الطلب</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      ملاحظة: يمكنك تعديل البنود والأسعار مباشرة من هذا الجدول داخل الملف حسب خدمات حمام القدس.
+    </div>
+  </aside>
+
 </div>
 
 <div class="copyright">جميع الحقوق محفوظة</div>
@@ -221,14 +286,14 @@
 
   // ضع نفس firebaseConfig هنا
   const firebaseConfig = {
-  apiKey: "AIzaSyBGHRhM7iU8EEgBQGrR67uDXme7Ko94v4c",
-  authDomain: "hammam-4430d.firebaseapp.com",
-  projectId: "hammam-4430d",
-  storageBucket: "hammam-4430d.firebasestorage.app",
-  messagingSenderId: "501453146862",
-  appId: "1:501453146862:web:1f4b0e5137fa3c235701ff",
-  measurementId: "G-2FW2V6FHHL"
-};
+    apiKey: "AIzaSyBGHRhM7iU8EEgBQGrR67uDXme7Ko94v4c",
+    authDomain: "hammam-4430d.firebaseapp.com",
+    projectId: "hammam-4430d",
+    storageBucket: "hammam-4430d.firebasestorage.app",
+    messagingSenderId: "501453146862",
+    appId: "1:501453146862:web:1f4b0e5137fa3c235701ff",
+    measurementId: "G-2FW2V6FHHL"
+  };
 
   const ONE_HOUR_MS = 60 * 60 * 1000;
 
@@ -246,6 +311,18 @@
   const nextRoom = document.getElementById("nextRoom");
   const nextRemaining = document.getElementById("nextRemaining");
   const nextStart = document.getElementById("nextStart");
+
+  // عناصر السلايدشو
+  const slideImg = document.getElementById("slideImg");
+  const slideCap = document.getElementById("slideCap");
+
+  // عدّل هذه القائمة حسب صورك ومساراتها
+  const slides = [
+    { src: "./assets/sauna.jpg",   cap: "ساونا" },
+    { src: "./assets/massage.jpg", cap: "تدليك" },
+    { src: "./assets/images1.jpeg", cap: "حمام القدس" }
+  ];
+  let slideIndex = 0;
 
   let rooms = [];
 
@@ -370,6 +447,20 @@
     }
   }
 
+  // سلايدشو صور: تبديل كل 5 ثوانٍ
+  function startSlideshow(){
+    function show(i){
+      const s = slides[i % slides.length];
+      slideImg.src = s.src;
+      slideCap.textContent = s.cap;
+    }
+    show(slideIndex);
+    setInterval(() => {
+      slideIndex = (slideIndex + 1) % slides.length;
+      show(slideIndex);
+    }, 5000);
+  }
+
   (async function main(){
     await signInAnonymously(auth);
     await ensureStateDoc();
@@ -381,11 +472,8 @@
     });
 
     setInterval(render, 1000);
+    startSlideshow();
   })();
 </script>
 </body>
 </html>
-
-
-
-
