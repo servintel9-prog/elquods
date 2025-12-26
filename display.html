@@ -13,9 +13,6 @@
       --radius: 18px;
       --safe: 24px;
     }
-    body{
-    padding: var(--safe);
-  }
     *{box-sizing:border-box}
 
     /* خلفية بصورة + طبقة تعتيم لرفع وضوح النص */
@@ -24,35 +21,29 @@
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
       color:var(--text);
       min-height:100vh;
+      padding: var(--safe);
       background:
-        linear-gradient(0deg, rgba(11,16,32,.68), rgba(11,16,32,.68)),
+        linear-gradient(0deg, rgba(11,16,32,.70), rgba(11,16,32,.70)),
         url("./assets/images1.jpeg") center/cover no-repeat;
     }
 
-    header{max-width:1760px;margin:0 auto;padding:18px 28px 6px}
-    h1{margin:0;font-size:42px;font-weight:1100}
-    .sub{color:var(--muted);font-size:16px;margin-top:6px}
+    header{
+      max-width:1600px;
+      width:100%;
+      margin-left:auto;
+      margin-right:auto;
+      padding: 10px 10px 6px;
+    }
+    h1{margin:0;font-size:34px;font-weight:1100}
+    .sub{color:var(--muted);font-size:14px;margin-top:6px}
 
-    /* ===== تخطيط TV ثلاثي الأعمدة =====
-       يمين: خدمات | وسط: غرف | يسار: أقرب غرفة + صور */
     .layout{
-  max-width: 1760px;
-  margin: 0 auto;
-  padding: 14px 28px 14px;
-  display: grid;
-
-  /* مهم: اجعل الأعمدة مرنة بدل أرقام ثابتة كبيرة */
-  grid-template-columns: minmax(300px, 22vw) 1fr minmax(300px, 22vw);
-  grid-template-areas: "right center left";
-  gap: 16px;
-  align-items: start;
-
-  /* تثبيت التمركز */
-  width: 100%;
-}
-    .right{ grid-area: right; }
-    .center{ grid-area: center; }
-    .left{ grid-area: left; }
+      max-width:1600px;
+      width:100%;
+      margin-left:auto;
+      margin-right:auto;
+      padding: 8px 10px 70px; /* مساحة للشريط المتحرك */
+    }
 
     .section{
       background: rgba(0,0,0,.34);
@@ -60,32 +51,33 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       padding: 14px;
-      direction: rtl;
     }
 
     .section-title{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       margin: 0 0 12px 0;
-      color: var(--text);
       font-weight: 1100;
-      font-size: 20px;
+      font-size: 18px;
     }
     .count{
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 900;
       border:1px solid var(--border);
       background: rgba(0,0,0,.18);
-      padding: 6px 10px;
+      padding: 5px 9px;
       border-radius: 999px;
+      direction:ltr;
     }
 
-    /* شبكة الغرف: تلقائية حسب عرض الوسط */
-    .grid{
+    /* شبكة ثابتة 3 أعمدة (صف1:3) (صف2:2 + سلايد بالوسط) */
+    .roomsGrid{
+      direction:ltr; /* لمنع انعكاس ترتيب الخلايا بسبب RTL */
       display:grid;
-      gap:16px;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(3, minmax(280px, 1fr));
+      gap: 16px;
     }
+    .roomCard, .slideCard{ direction:rtl; }
 
     .card{
       background:rgba(0,0,0,.22);
@@ -95,167 +87,98 @@
       padding:16px;
       backdrop-filter: blur(2px);
     }
+
     .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .room-title{font-weight:1100;font-size:22px}
+    .room-title{font-weight:1100;font-size:18px}
     .badge{
-      font-size:13px;padding:7px 12px;border-radius:999px;border:1px solid var(--border);
+      font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);
       color:var(--muted);background:rgba(255,255,255,.03);font-weight:900
     }
     .badge.free{color:#d1fae5;border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.10)}
     .badge.busy{color:#cffafe;border-color:rgba(45,212,191,.35);background:rgba(45,212,191,.10)}
+
     .timer{
-      margin-top:12px; font-variant-numeric:tabular-nums; font-size:52px; font-weight:1100;
-      padding:12px 12px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.26);
-      text-align:center; direction:ltr;
+      margin-top:12px;
+      font-variant-numeric:tabular-nums;
+      font-size:34px;
+      font-weight:1100;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.26);
+      text-align:center;
+      direction:ltr;
     }
-    .timer.normal{color:var(--ok)} .timer.warn{color:var(--warn)}
+    .timer.normal{color:var(--ok)}
+    .timer.warn{color:var(--warn)}
     .timer.over{color:var(--bad);border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.10)}
-    .meta{margin-top:10px;color:var(--muted);font-size:15px;line-height:1.7}
+
+    .meta{margin-top:10px;color:var(--muted);font-size:13px;line-height:1.7}
     .meta b{color:var(--text);font-weight:1100}
 
-    /* يمين: جدول الخدمات */
-    .services-table{
-      width:100%;
-      border-collapse: collapse;
+    /* بطاقة السلايد في الوسط (بحجم الغرفة) */
+    .slideCard{
+      background:rgba(0,0,0,.22);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
       overflow:hidden;
-      border-radius: var(--radius);
+    }
+    .slideBox{
       border:1px solid var(--border);
-      background: rgba(0,0,0,.16);
-    }
-    .services-table th, .services-table td{
-      padding: 11px 10px;
-      border-bottom:1px solid var(--border);
-      font-size: 14px;
-    }
-    .services-table th{
-      text-align:right;
-      color: var(--muted);
-      font-weight: 1100;
-      background: rgba(255,255,255,.03);
-    }
-    .services-table td:last-child{
-      text-align:left;
-      direction:ltr;
-      font-weight: 1100;
-      color: var(--text);
-      white-space: nowrap;
-      min-width: 110px;
-    }
-
-    /* يسار: لوحة أقرب غرفة */
-    .panel{
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px;
-      background: rgba(0,0,0,.18);
-    }
-    .line{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding: 10px 0;
-      border-bottom:1px solid var(--border);
-    }
-    .line:last-child{border-bottom:none}
-    .label{color:var(--muted); font-size: 14px; font-weight: 900;}
-    .value{color:var(--text); font-size: 18px; font-weight: 1100; direction:ltr;}
-    .value.ar{direction:rtl}
-
-    /* سلايد صور */
-    .slideshow{
-      margin-top: 12px;
-      border:1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius:14px;
       overflow:hidden;
       background: rgba(0,0,0,.16);
     }
-    .slideshow img{
+    .slideBox img{
       width:100%;
-      height: 240px;
-      object-fit: cover;
+      height: 200px;
+      object-fit:cover;
       display:block;
     }
-    .slideshow .cap{
-      padding: 10px 12px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 1000;
+    .slideBox .cap{
+      padding:10px 12px;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:1000;
       border-top:1px solid var(--border);
       background: rgba(0,0,0,.10);
     }
 
-    .copyright{
-      max-width:1760px;margin:10px auto 16px;padding:0 28px;
-      text-align:center;color:var(--muted);font-size:14px
+    /* شريط متحرك أسفل الشاشة: من اليسار إلى اليمين */
+    .ticker{
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9999;
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(8px);
+      padding: 10px 0;
+      overflow: hidden;
     }
-    /* ===== ANDROID TV 1080p PROFILE ===== */
-@media (max-width: 1920px) {
+    .ticker__track{
+      width: 100%;
+      white-space: nowrap;
+      will-change: transform;
+      animation: ticker-ltr 18s linear infinite;
+    }
+    .ticker__item{
+      display:inline-block;
+      padding: 0 28px;
+      font-weight:1100;
+      color:var(--text);
+      opacity:.95;
+    }
+    @keyframes ticker-ltr{
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
 
-  body {
-    font-size: 14px;
-  }
-
-  h1 {
-    font-size: 32px !important;
-  }
-
-  .sub {
-    font-size: 14px !important;
-  }
-
-  .layout {
-    max-width: 1600px;
-    grid-template-columns: 360px 1fr 360px;
-    gap: 12px;
-  }
-
-  header {
-    padding: 10px 24px 4px;
-  }
-header,
-.layout {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-  .section {
-    padding: 12px;
-  }
-
-  .section-title {
-    font-size: 18px;
-  }
-
-  .room-title {
-    font-size: 18px;
-  }
-
-  .timer{
-  font-size: 34px !important;
-  padding: 10px !important;
-}
-
-  .badge {
-    font-size: 12px;
-    padding: 5px 10px;
-  }
-
-  .meta {
-    font-size: 13px;
-  }
-
-  .services-table th,
-  .services-table td {
-    font-size: 13px;
-    padding: 8px;
-  }
-
-  .slideshow img {
-    height: 160px;
-  }
-}
-    /* ANDROID TV SCALE (reduce overall size) */
-body{
-  zoom: 0.85;
-}
+    /* Android TV: تصغير بسيط إن احتجت */
+    body{ zoom: 0.90; }
   </style>
 </head>
 
@@ -266,86 +189,30 @@ body{
 </header>
 
 <div class="layout">
-
-  <!-- ===== Right: Services ===== -->
-  <aside class="right section">
-    <div class="section-title">
-      <span>الخدمات والأسعار</span>
-      <span class="count">دج</span>
-    </div>
-    <table class="services-table" role="table" aria-label="الخدمات والأسعار">
-      <thead>
-        <tr><th>الخدمة</th><th>السعر</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>الدخول (للشخص)</td><td>400</td></tr>
-        <tr><td>تمديد بعد الساعة (كل 15 دقيقة)</td><td>+100</td></tr>
-        <tr><td>ساونا</td><td>حسب الطلب</td></tr>
-        <tr><td>تدليك</td><td>حسب الطلب</td></tr>
-      </tbody>
-    </table>
-  </aside>
-
-  <!-- ===== Center: Rooms ===== -->
-  <main class="center content">
+  <main class="content">
     <div class="section">
       <div class="section-title">
-        <span>الغرف الشاغرة</span>
+        <span>الغرف</span>
         <span class="count" id="freeCount">0</span>
       </div>
-      <div id="freeGrid" class="grid"></div>
-    </div>
 
-    <div style="height:16px"></div>
-
-    <div class="section">
-      <div class="section-title">
-        <span>الغرف المحجوزة</span>
-        <span class="count" id="busyCount">0</span>
-      </div>
-      <div id="busyGrid" class="grid"></div>
+      <div id="roomsGrid" class="roomsGrid"></div>
     </div>
   </main>
-
-  <!-- ===== Left: Next + Slideshow ===== -->
-  <aside class="left section">
-    <div class="section-title">
-      <span>أقرب غرفة ستفرغ</span>
-      <span class="count">ضمن الساعة</span>
-    </div>
-
-    <div class="panel" id="nextPanel">
-      <div class="line">
-        <div class="label">الحالة</div>
-        <div class="value ar" id="nextStatus">—</div>
-      </div>
-      <div class="line">
-        <div class="label">الغرفة</div>
-        <div class="value ar" id="nextRoom">—</div>
-      </div>
-      <div class="line">
-        <div class="label">المتبقي حتى ساعة</div>
-        <div class="value" id="nextRemaining">—</div>
-      </div>
-      <div class="line">
-        <div class="label">وقت البداية</div>
-        <div class="value" id="nextStart">—</div>
-      </div>
-    </div>
-
-    <div class="slideshow" aria-label="عرض صور متتابع">
-      <img id="slideImg" src="./assets/sauna.jpg" alt="عرض صور" />
-      <div class="cap" id="slideCap">ساونا</div>
-    </div>
-  </aside>
-
 </div>
 
-<div class="copyright">جميع الحقوق محفوظة</div>
+<!-- شريط متحرك للخدمات والأسعار -->
+<div class="ticker" aria-label="الخدمات والأسعار">
+  <div class="ticker__track" id="tickerTrack">
+    <span class="ticker__item">
+      التسعير: السعر الأساسي = عدد الأشخاص × 400 دج (1–4) — بعد الساعة: كل ربع ساعة +100 دج — ساونا: حسب الطلب — تدليك: حسب الطلب
+    </span>
+  </div>
+</div>
 
 <!-- ===== Background Music for Android TV ===== -->
 <audio id="bgMusic" preload="auto" loop>
-  <source src="./assets/musique.mp3" type="audio/mpeg">
+  <source src="./assets/music.mp3" type="audio/mpeg">
 </audio>
 
 <script type="module">
@@ -353,7 +220,7 @@ body{
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
   import { getFirestore, doc, onSnapshot, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-  // ===== Firebase config (كما كان عندك) =====
+  // ===== Firebase config =====
   const firebaseConfig = {
     apiKey: "AIzaSyBGHRhM7iU8EEgBQGrR67uDXme7Ko94v4c",
     authDomain: "hammam-4430d.firebaseapp.com",
@@ -366,9 +233,9 @@ body{
 
   const ONE_HOUR_MS = 60 * 60 * 1000;
 
-  // ===== Android TV music: يبدأ بعد أول ضغطة =====
+  // ===== Android TV Music: يبدأ بعد أول ضغطة =====
   const music = document.getElementById("bgMusic");
-  music.volume = 0.25; // 0..1
+  music.volume = 0.25;
   let musicStarted = false;
 
   async function startMusicOnce(){
@@ -377,8 +244,6 @@ body{
     try { await music.play(); }
     catch(e){ musicStarted = false; }
   }
-
-  // أي زر من الريموت (OK/أسهم/Back..) يحسب تفاعل
   document.addEventListener("keydown", startMusicOnce);
   document.addEventListener("click", startMusicOnce);
   window.addEventListener("load", startMusicOnce);
@@ -389,40 +254,9 @@ body{
   const db = getFirestore(app);
   const stateRef = doc(db, "hamam", "state");
 
-  const freeGrid = document.getElementById("freeGrid");
-  const busyGrid = document.getElementById("busyGrid");
+  const roomsGrid = document.getElementById("roomsGrid");
   const freeCount = document.getElementById("freeCount");
-  const busyCount = document.getElementById("busyCount");
 
-  const nextStatus = document.getElementById("nextStatus");
-  const nextRoom = document.getElementById("nextRoom");
-  const nextRemaining = document.getElementById("nextRemaining");
-  const nextStart = document.getElementById("nextStart");
-
-  // ===== Slideshow =====
-  const slideImg = document.getElementById("slideImg");
-  const slideCap = document.getElementById("slideCap");
-  const slides = [
-    { src: "./assets/sauna.jpg", cap: "ساونا" },
-    { src: "./assets/massage.jpg", cap: "تدليك" },
-    { src: "./assets/images1.jpeg", cap: "حمام القدس" }
-  ];
-  let slideIndex = 0;
-
-  function startSlideshow(){
-    function show(i){
-      const s = slides[i % slides.length];
-      slideImg.src = s.src;
-      slideCap.textContent = s.cap;
-    }
-    show(slideIndex);
-    setInterval(() => {
-      slideIndex = (slideIndex + 1) % slides.length;
-      show(slideIndex);
-    }, 5000);
-  }
-
-  // ===== Rooms logic (كما كان عندك) =====
   let rooms = [];
 
   function defaultRooms(){
@@ -481,74 +315,89 @@ body{
     }
   }
 
-  function findNextToFree(nowMs){
-    const candidates = rooms
-      .filter(r => r.status === "OCCUPIED" && r.startMs)
-      .map(r => {
-        const elapsed = nowMs - r.startMs;
-        const remaining = ONE_HOUR_MS - elapsed;
-        return { r, remaining };
-      })
-      .filter(x => x.remaining > 0);
+  function makeRoomCard(room, nowMs){
+    const disp = computeDisplay(room, nowMs);
+    const card = document.createElement("div");
+    card.className = "card roomCard";
+    card.innerHTML = `
+      <div class="row">
+        <div class="room-title">غرفة ${room.id}</div>
+        <div class="badge ${disp.badgeClass}">${disp.badgeText}</div>
+      </div>
+      <div class="timer ${disp.timerClass}">${disp.timerText}</div>
+      <div class="meta">${disp.meta}</div>
+    `;
+    return card;
+  }
 
-    if(candidates.length === 0) return null;
-    candidates.sort((a,b) => a.remaining - b.remaining);
-    return candidates[0];
+  function makeSlideCard(totalRooms){
+    const card = document.createElement("div");
+    card.className = "slideCard";
+    card.innerHTML = `
+      <div class="section-title" style="margin:0 0 10px 0">
+        <span>صور الحمام</span>
+        <span class="count">${totalRooms}</span>
+      </div>
+      <div class="slideBox">
+        <img id="slideImg" src="./assets/sauna.jpg" alt="عرض صور" />
+        <div class="cap" id="slideCap">ساونا</div>
+      </div>
+    `;
+    return card;
+  }
+
+  function startInlineSlideshow(){
+    const img = document.getElementById("slideImg");
+    const cap = document.getElementById("slideCap");
+    if(!img || !cap) return;
+
+    const slides = [
+      { src: "./assets/sauna.jpg", cap: "ساونا" },
+      { src: "./assets/massage.jpg", cap: "تدليك" },
+      { src: "./assets/images1.jpeg", cap: "حمام القدس" }
+    ];
+
+    let i = 0;
+
+    if(window.__slideInterval) clearInterval(window.__slideInterval);
+
+    img.src = slides[0].src;
+    cap.textContent = slides[0].cap;
+
+    window.__slideInterval = setInterval(() => {
+      i = (i + 1) % slides.length;
+      img.src = slides[i].src;
+      cap.textContent = slides[i].cap;
+    }, 5000);
   }
 
   function render(){
     const nowMs = Date.now();
-    freeGrid.innerHTML = "";
-    busyGrid.innerHTML = "";
+    roomsGrid.innerHTML = "";
 
-    const freeRooms = rooms.filter(r => r.status === "FREE" || !r.startMs);
-    const busyRooms = rooms.filter(r => r.status === "OCCUPIED" && r.startMs);
+    const sorted = [...rooms].sort((a,b) => a.id - b.id);
+    const freeRoomsCount = sorted.filter(r => r.status === "FREE" || !r.startMs).length;
+    freeCount.textContent = String(freeRoomsCount);
 
-    freeCount.textContent = String(freeRooms.length);
-    busyCount.textContent = String(busyRooms.length);
-
-    for(const room of freeRooms){
-      const disp = computeDisplay(room, nowMs);
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <div class="row">
-          <div class="room-title">غرفة ${room.id}</div>
-          <div class="badge ${disp.badgeClass}">${disp.badgeText}</div>
-        </div>
-        <div class="timer ${disp.timerClass}">${disp.timerText}</div>
-        <div class="meta">${disp.meta}</div>
-      `;
-      freeGrid.appendChild(card);
+    // إذا ليس لدينا 5 غرف بالضبط: نعرض كل الغرف فقط (بدون سلايد وسط الصف2)
+    if(sorted.length !== 5){
+      for(const r of sorted){
+        roomsGrid.appendChild(makeRoomCard(r, nowMs));
+      }
+      return;
     }
 
-    for(const room of busyRooms){
-      const disp = computeDisplay(room, nowMs);
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <div class="row">
-          <div class="room-title">غرفة ${room.id}</div>
-          <div class="badge ${disp.badgeClass}">${disp.badgeText}</div>
-        </div>
-        <div class="timer ${disp.timerClass}">${disp.timerText}</div>
-        <div class="meta">${disp.meta}</div>
-      `;
-      busyGrid.appendChild(card);
-    }
+    // صف 1: 1,2,3
+    roomsGrid.appendChild(makeRoomCard(sorted[0], nowMs));
+    roomsGrid.appendChild(makeRoomCard(sorted[1], nowMs));
+    roomsGrid.appendChild(makeRoomCard(sorted[2], nowMs));
 
-    const next = findNextToFree(nowMs);
-    if(!next){
-      nextStatus.textContent = "لا توجد غرفة ستفرغ قريبًا";
-      nextRoom.textContent = "—";
-      nextRemaining.textContent = "—";
-      nextStart.textContent = "—";
-    } else {
-      nextStatus.textContent = "ضمن الساعة (ستنتهي أولًا)";
-      nextRoom.textContent = `غرفة ${next.r.id}`;
-      nextRemaining.textContent = fmtHMS(next.remaining);
-      nextStart.textContent = fmtTime(next.r.startMs);
-    }
+    // صف 2: 4, [SLIDE], 5
+    roomsGrid.appendChild(makeRoomCard(sorted[3], nowMs));
+    roomsGrid.appendChild(makeSlideCard(sorted.length));
+    roomsGrid.appendChild(makeRoomCard(sorted[4], nowMs));
+
+    startInlineSlideshow();
   }
 
   async function ensureStateDoc(){
@@ -564,21 +413,14 @@ body{
 
     onSnapshot(stateRef, (snap) => {
       const data = snap.data();
-      rooms = (data?.rooms && Array.isArray(data.rooms) && data.rooms.length === 5)
+      rooms = (data?.rooms && Array.isArray(data.rooms) && data.rooms.length >= 1)
         ? data.rooms
         : defaultRooms();
       render();
     });
 
     setInterval(render, 1000);
-    startSlideshow();
   })();
 </script>
 </body>
 </html>
-
-
-
-
-
-
