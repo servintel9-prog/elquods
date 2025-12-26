@@ -36,30 +36,23 @@
     /* ===== تخطيط TV ثلاثي الأعمدة =====
        يمين: خدمات | وسط: غرف | يسار: أقرب غرفة + صور */
     .layout{
-      max-width:1760px;
-      margin: 0 auto;
-      padding: 10px 24px 4px;
-      display: grid;
-      direction: rtl;
+  max-width: 1760px;
+  margin: 0 auto;
+  padding: 14px 28px 14px;
+  display: grid;
 
-      grid-template-columns: 420px minmax(860px, 1fr) 420px;
-      grid-template-areas: "right center left";
-      gap: 16px;
-      align-items: start;
-    }
+  /* مهم: اجعل الأعمدة مرنة بدل أرقام ثابتة كبيرة */
+  grid-template-columns: minmax(300px, 22vw) 1fr minmax(300px, 22vw);
+  grid-template-areas: "right center left";
+  gap: 16px;
+  align-items: start;
+
+  /* تثبيت التمركز */
+  width: 100%;
+}
     .right{ grid-area: right; }
     .center{ grid-area: center; }
     .left{ grid-area: left; }
-
-    @media (max-width: 1400px){
-      .layout{
-        grid-template-columns: 1fr;
-        grid-template-areas:
-          "center"
-          "right"
-          "left";
-      }
-    }
 
     .section{
       background: rgba(0,0,0,.34);
@@ -217,7 +210,12 @@
   header {
     padding: 10px 24px 4px;
   }
-
+header,
+.layout {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
   .section {
     padding: 12px;
   }
@@ -574,6 +572,7 @@
 </script>
 </body>
 </html>
+
 
 
 
