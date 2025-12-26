@@ -203,7 +203,7 @@
 
   .layout {
     max-width: 1600px;
-    grid-template-columns: 320px minmax(720px, 1fr) 320px;
+    grid-template-columns: 360px 1fr 360px;
     gap: 12px;
   }
 
@@ -228,10 +228,10 @@ header,
     font-size: 18px;
   }
 
-  .timer {
-    font-size: 36px !important;
-    padding: 10px;
-  }
+  .timer{
+  font-size: 34px !important;
+  padding: 10px !important;
+}
 
   .badge {
     font-size: 12px;
@@ -249,8 +249,12 @@ header,
   }
 
   .slideshow img {
-    height: 180px;
+    height: 160px;
   }
+}
+    /* ANDROID TV SCALE (reduce overall size) */
+body{
+  zoom: 0.85;
 }
   </style>
 </head>
@@ -572,6 +576,7 @@ header,
 </script>
 </body>
 </html>
+
 
 
 
