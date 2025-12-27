@@ -261,6 +261,8 @@
 
   let rooms = [];
 
+  let uiBuilt = false;
+
   function defaultRooms(){
     return Array.from({length:5}, (_,i)=>({ id:i+1, status:"FREE", startMs:null, persons:null }));
   }
@@ -378,36 +380,92 @@
   }, 5000);
 }
 
+  function buildUI(){
+  const nowMs = Date.now();
 
-  function render(){
-    const nowMs = Date.now();
-    roomsGrid.innerHTML = "";
+  // نبني DOM مرة واحدة فقط
+  roomsGrid.innerHTML = "";
 
-    const sorted = [...rooms].sort((a,b) => a.id - b.id);
-    const freeRoomsCount = sorted.filter(r => r.status === "FREE" || !r.startMs).length;
-    freeCount.textContent = String(freeRoomsCount);
+  const sorted = [...rooms].sort((a,b) => a.id - b.id);
 
-    // إذا ليس لدينا 5 غرف بالضبط: نعرض كل الغرف فقط (بدون سلايد وسط الصف2)
-    if(sorted.length !== 5){
-      for(const r of sorted){
-        roomsGrid.appendChild(makeRoomCard(r, nowMs));
-      }
-      return;
+  // تحديث العدد الفوري
+  const freeRoomsCount = sorted.filter(r => r.status === "FREE" || !r.startMs).length;
+  freeCount.textContent = String(freeRoomsCount);
+
+  // إن لم تكن 5 غرف: نعرض الغرف فقط
+  if(sorted.length !== 5){
+    for(const r of sorted){
+      const card = makeRoomCard(r, nowMs);
+      // مهم: نخزن id الغرفة على البطاقة للتحديث لاحقًا
+      card.dataset.roomId = String(r.id);
+      roomsGrid.appendChild(card);
     }
-
-    // صف 1: 1,2,3
-    roomsGrid.appendChild(makeRoomCard(sorted[0], nowMs));
-    roomsGrid.appendChild(makeRoomCard(sorted[1], nowMs));
-    roomsGrid.appendChild(makeRoomCard(sorted[2], nowMs));
-
-    // صف 2: 4, [SLIDE], 5
-    roomsGrid.appendChild(makeRoomCard(sorted[3], nowMs));
-    roomsGrid.appendChild(makeSlideCard(sorted.length));
-    roomsGrid.appendChild(makeRoomCard(sorted[4], nowMs));
-
-    startInlineSlideshow();
+    uiBuilt = true;
+    return;
   }
 
+  // صف 1: 1,2,3
+  for(let i=0;i<3;i++){
+    const card = makeRoomCard(sorted[i], nowMs);
+    card.dataset.roomId = String(sorted[i].id);
+    roomsGrid.appendChild(card);
+  }
+
+  // صف 2: 4, [SLIDE], 5
+  const card4 = makeRoomCard(sorted[3], nowMs);
+  card4.dataset.roomId = String(sorted[3].id);
+  roomsGrid.appendChild(card4);
+
+  roomsGrid.appendChild(makeSlideCard(sorted.length));
+
+  const card5 = makeRoomCard(sorted[4], nowMs);
+  card5.dataset.roomId = String(sorted[4].id);
+  roomsGrid.appendChild(card5);
+
+  uiBuilt = true;
+
+  // ابدأ السلايد مرة واحدة
+  startInlineSlideshow();
+}
+
+function updateTimersOnly(){
+  if(!uiBuilt) return;
+
+  const nowMs = Date.now();
+  const sorted = [...rooms].sort((a,b) => a.id - b.id);
+
+  // تحديث عدد الغرف الفارغة كل ثانية
+  const freeRoomsCount = sorted.filter(r => r.status === "FREE" || !r.startMs).length;
+  freeCount.textContent = String(freeRoomsCount);
+
+  // تحديث كل بطاقة غرفة حسب roomId المخزن
+  const cards = roomsGrid.querySelectorAll(".roomCard");
+  for(const card of cards){
+    const id = Number(card.dataset.roomId);
+    const room = sorted.find(r => r.id === id);
+    if(!room) continue;
+
+    const disp = computeDisplay(room, nowMs);
+
+    const badge = card.querySelector(".badge");
+    const timer = card.querySelector(".timer");
+    const meta  = card.querySelector(".meta");
+
+    if(badge){
+      badge.className = `badge ${disp.badgeClass}`;
+      badge.textContent = disp.badgeText;
+    }
+    if(timer){
+      timer.className = `timer ${disp.timerClass}`;
+      timer.textContent = disp.timerText;
+    }
+    if(meta){
+      meta.innerHTML = disp.meta;
+    }
+  }
+}
+
+  
   async function ensureStateDoc(){
     const snap = await getDoc(stateRef);
     if(!snap.exists()){
@@ -416,22 +474,28 @@
   }
 
   (async function main(){
-    await signInAnonymously(auth);
-    await ensureStateDoc();
+  await signInAnonymously(auth);
+  await ensureStateDoc();
 
-    onSnapshot(stateRef, (snap) => {
-      const data = snap.data();
-      rooms = (data?.rooms && Array.isArray(data.rooms) && data.rooms.length >= 1)
-        ? data.rooms
-        : defaultRooms();
-      render();
-    });
+  onSnapshot(stateRef, (snap) => {
+    const data = snap.data();
+    rooms = (data?.rooms && Array.isArray(data.rooms) && data.rooms.length >= 1)
+      ? data.rooms
+      : defaultRooms();
 
-    setInterval(render, 1000);
-  })();
+    uiBuilt = false;
+    buildUI();
+    updateTimersOnly();
+  });
+
+  setInterval(updateTimersOnly, 1000);
+})();
+
+
 </script>
 </body>
 </html>
+
 
 
 
