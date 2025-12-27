@@ -262,10 +262,6 @@
   let rooms = [];
 
   let uiBuilt = false;
-  /* ⬇⬇⬇ أضِفهما هنا بالضبط ⬇⬇⬇ */
-let lastRoomCount = -1;
-let lastLayoutKey = "";
-/* ⬆⬆⬆ */
 
   function defaultRooms(){
     return Array.from({length:5}, (_,i)=>({ id:i+1, status:"FREE", startMs:null, persons:null }));
@@ -347,50 +343,40 @@ let lastLayoutKey = "";
         <span class="count">${totalRooms}</span>
       </div>
       <div class="slideBox">
-        <img id="slideImg" src="" alt="عرض صور" />
-        <div class="cap" id="slideCap"></div>
+        <img id="slideImg" src="./assets/sauna.jpg" alt="عرض صور" />
+        <div class="cap" id="slideCap">ساونا</div>
       </div>
     `;
     return card;
   }
 
   function startInlineSlideshow(){
-  // جهّز السلايدات مرة واحدة
-  if(!window.__slides){
-    window.__slides = [
-      { src: "./assets/sauna.jpg",    cap: "ساونا" },
-      { src: "./assets/massage.jpg",  cap: "تدليك" },
-      { src: "./assets/images1.jpeg", cap: "حمام القدس" }
-    ];
-  }
+  // شغّل الـ interval مرة واحدة فقط
+  if (window.__slideInterval) return;
 
-  // لا تصفّر المؤشر كل مرة
-  if(typeof window.__slideIndex !== "number") window.__slideIndex = 0;
+  window.__slides = [
+    { src: "./assets/sauna.jpg",   cap: "ساونا" },
+    { src: "./assets/massage.jpg", cap: "تدليك" },
+    { src: "./assets/images1.jpeg",cap: "حمام القدس" }
+  ];
+  window.__slideIndex = 0;
 
-  // دالة تطبيق السلايد على العنصر الحالي
+  // عيّن أول صورة فورًا (حتى لو كان العنصر يتبدّل)
   function applySlide(){
     const img = document.getElementById("slideImg");
     const cap = document.getElementById("slideCap");
-    if(!img || !cap) return;
+    if(!img || !cap) return; // بطاقة السلايد غير موجودة الآن
 
     const s = window.__slides[window.__slideIndex];
-    // تجنّب إعادة تعيين src إذا لم يتغير (يقلل الوميض)
-    if(img.getAttribute("data-src") !== s.src){
-      img.src = s.src;
-      img.setAttribute("data-src", s.src);
-    }
+    img.src = s.src;
     cap.textContent = s.cap;
   }
 
-  // طبّق فورًا على البطاقة الحالية
   applySlide();
-
-  // شغّل interval مرة واحدة فقط
-  if(window.__slideInterval) return;
 
   window.__slideInterval = setInterval(() => {
     window.__slideIndex = (window.__slideIndex + 1) % window.__slides.length;
-    applySlide();
+    applySlide(); // مهم: يلتقط العنصر الحالي بعد كل render
   }, 5000);
 }
 
@@ -492,34 +478,20 @@ function updateTimersOnly(){
   await ensureStateDoc();
 
   onSnapshot(stateRef, (snap) => {
-  const data = snap.data();
-  rooms = (data?.rooms && Array.isArray(data.rooms) && data.rooms.length >= 1)
-    ? data.rooms
-    : defaultRooms();
+    const data = snap.data();
+    rooms = (data?.rooms && Array.isArray(data.rooms) && data.rooms.length >= 1)
+      ? data.rooms
+      : defaultRooms();
 
-  // مفتاح بسيط يحدد إن كان يجب إعادة بناء الواجهة
-  const sorted = [...rooms].sort((a,b)=>a.id-b.id);
-  const roomCount = sorted.length;
+    uiBuilt = false;
+    buildUI();
+    updateTimersOnly();
+  });
 
-  // إذا تغيّر عدد الغرف أو لم تُبنَ الواجهة بعد: ابنِ UI
-  if(!uiBuilt || roomCount !== lastRoomCount){
-    lastRoomCount = roomCount;
-    buildUI();          // يبني DOM مرة واحدة عند الحاجة
-    startInlineSlideshow(); // يضمن تطبيق السلايد على العنصر الحالي
-  }
-
-  // دائمًا: حدّث التايمرات فقط
-  updateTimersOnly();
-});
+  setInterval(updateTimersOnly, 1000);
+})();
 
 
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
