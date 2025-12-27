@@ -349,29 +349,31 @@
   }
 
   function startInlineSlideshow(){
-    const img = document.getElementById("slideImg");
-    const cap = document.getElementById("slideCap");
-    if(!img || !cap) return;
+  // إن كان بدأ بالفعل، لا تعيد تشغيله كل مرة
+  if (window.__slideStarted) return;
 
-    const slides = [
-      { src: "./assets/sauna.jpg", cap: "ساونا" },
-      { src: "./assets/massage.jpg", cap: "تدليك" },
-      { src: "./assets/images1.jpeg", cap: "حمام القدس" }
-    ];
+  const img = document.getElementById("slideImg");
+  const cap = document.getElementById("slideCap");
+  if(!img || !cap) return;
 
-    let i = 0;
+  const slides = [
+    { src: "./assets/sauna.jpg", cap: "ساونا" },
+    { src: "./assets/massage.jpg", cap: "تدليك" },
+    { src: "./assets/images1.jpeg", cap: "حمام القدس" }
+  ];
 
-    if(window.__slideInterval) clearInterval(window.__slideInterval);
+  let i = 0;
+  window.__slideStarted = true;
 
-    img.src = slides[0].src;
-    cap.textContent = slides[0].cap;
+  img.src = slides[0].src;
+  cap.textContent = slides[0].cap;
 
-    window.__slideInterval = setInterval(() => {
-      i = (i + 1) % slides.length;
-      img.src = slides[i].src;
-      cap.textContent = slides[i].cap;
-    }, 5000);
-  }
+  window.__slideInterval = setInterval(() => {
+    i = (i + 1) % slides.length;
+    img.src = slides[i].src;
+    cap.textContent = slides[i].cap;
+  }, 5000);
+}
 
   function render(){
     const nowMs = Date.now();
@@ -426,5 +428,6 @@
 </script>
 </body>
 </html>
+
 
 
