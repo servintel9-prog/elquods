@@ -349,31 +349,35 @@
   }
 
   function startInlineSlideshow(){
-  // إن كان بدأ بالفعل، لا تعيد تشغيله كل مرة
-  if (window.__slideStarted) return;
+  // شغّل الـ interval مرة واحدة فقط
+  if (window.__slideInterval) return;
 
-  const img = document.getElementById("slideImg");
-  const cap = document.getElementById("slideCap");
-  if(!img || !cap) return;
-
-  const slides = [
-    { src: "./assets/sauna.jpg", cap: "ساونا" },
+  window.__slides = [
+    { src: "./assets/sauna.jpg",   cap: "ساونا" },
     { src: "./assets/massage.jpg", cap: "تدليك" },
-    { src: "./assets/images1.jpeg", cap: "حمام القدس" }
+    { src: "./assets/images1.jpeg",cap: "حمام القدس" }
   ];
+  window.__slideIndex = 0;
 
-  let i = 0;
-  window.__slideStarted = true;
+  // عيّن أول صورة فورًا (حتى لو كان العنصر يتبدّل)
+  function applySlide(){
+    const img = document.getElementById("slideImg");
+    const cap = document.getElementById("slideCap");
+    if(!img || !cap) return; // بطاقة السلايد غير موجودة الآن
 
-  img.src = slides[0].src;
-  cap.textContent = slides[0].cap;
+    const s = window.__slides[window.__slideIndex];
+    img.src = s.src;
+    cap.textContent = s.cap;
+  }
+
+  applySlide();
 
   window.__slideInterval = setInterval(() => {
-    i = (i + 1) % slides.length;
-    img.src = slides[i].src;
-    cap.textContent = slides[i].cap;
+    window.__slideIndex = (window.__slideIndex + 1) % window.__slides.length;
+    applySlide(); // مهم: يلتقط العنصر الحالي بعد كل render
   }, 5000);
 }
+
 
   function render(){
     const nowMs = Date.now();
@@ -428,6 +432,7 @@
 </script>
 </body>
 </html>
+
 
 
 
