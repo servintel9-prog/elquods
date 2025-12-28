@@ -12,6 +12,7 @@
       --border:rgba(255,255,255,.08); --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius: 18px;
       --safe: 24px;
+      --green:#22c55e;
     }
     *{box-sizing:border-box}
 
@@ -32,19 +33,21 @@
       width:100%;
       margin-left:auto;
       margin-right:auto;
-      padding: 10px 10px 6px;
+      padding: 10px 10px 0px;
 
       text-align: center;
     }
     h1{margin:0;font-size:54px;font-weight:1100}
     .sub{color:var(--muted);font-size:14px;margin-top:6px}
-
+    header h1{
+    color: var(--warn);
+  }
     .layout{
       max-width:1600px;
       width:100%;
       margin-left:auto;
       margin-right:auto;
-      padding: 8px 10px 70px; /* مساحة للشريط المتحرك */
+      padding: 0px 10px 70px; /* مساحة للشريط المتحرك */
     }
 
     .section{
@@ -56,11 +59,17 @@
     }
 
     .section-title{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       margin: 0 0 12px 0;
-      font-weight: 1100;
-      font-size: 18px;
+      font-weight:1100;
+      font-size:18px;
     }
+    
+    .section-title .titleTicker__item{
+    color: var(--green) !important;
+  }
     .count{
       color: var(--muted);
       font-size: 13px;
@@ -90,7 +99,27 @@
       backdrop-filter: blur(2px);
     }
 
-    .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .row{
+  display:grid;
+  grid-template-columns: 1fr auto 1fr; /* يمين/وسط/يسار */
+  align-items:center;
+  gap:10px;
+}
+
+    .room-title.ar{
+  text-align:right;
+  direction:rtl;
+}
+
+    .room-title.fr{
+  text-align:left;
+  direction:ltr;
+}
+
+    .row .badge{
+  justify-self:center;   /* في الوسط تمامًا */
+  text-align:center;
+}
     .room-title{font-weight:1100;font-size:18px}
     .badge{
       font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);
@@ -148,61 +177,112 @@
       background: rgba(0,0,0,.10);
     }
 
-    /* شريط متحرك أسفل الشاشة: من اليسار إلى اليمين */
-    .ticker{
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 9999;
-      border-top: 1px solid var(--border);
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(8px);
-      padding: 10px 0;
-      overflow: hidden;
-    }
-    .ticker__track{
-      width: 100%;
-      white-space: nowrap;
-      will-change: transform;
-      animation: ticker-ltr 18s linear infinite;
-    }
-    .ticker__item{
-      display:inline-block;
-      padding: 0 28px;
-      font-weight:1100;
-      color:var(--text);
-      opacity:.95;
-    }
-    .ticker1{
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 9999;
-      border-top: 1px solid var(--border);
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(8px);
-      padding: 10px 0;
-      overflow: hidden;
-    }
-    .ticker1__track{
-      width: 100%;
-      white-space: nowrap;
-      will-change: transform;
-      animation: ticker-ltr 18s linear infinite;
-    }
-    .ticker1__item{
-      display:inline-block;
-      padding: 0 28px;
-      font-weight:1100;
-      color:var(--text);
-      opacity:.95;
-    }
-    @keyframes ticker-ltr{
-      0%   { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
+    /* اجعل صندوق السلايد مرجعاً للـ overlay */
+.slideBox{ position: relative; }
+
+/* شريط صغير داخل العنوان لتحريك كلمة "كيف" من اليمين إلى اليسار */
+
+@keyframes ticker-ltr{
+  0%   { transform: translateX(-100%); } /* يبدأ من خارج الشاشة يسارًا */
+  100% { transform: translateX(100%); }  /* يخرج من اليمين */
+}
+
+.titleTicker{
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+}
+
+.titleTicker__track{
+  display: inline-block;
+  width: max-content;              /* يتحرك بطول النص */
+  white-space: nowrap;
+  will-change: transform;
+
+  animation: ticker-ltr 12s linear infinite;
+  -webkit-animation: ticker-ltr 12s linear infinite; /* Android TV/WebView */
+}
+
+.titleTicker__item{
+  display: inline-block;
+  font-weight: 1100;
+  color: var(--text);
+}
+
+/* ====== شريط داخل السلايد ====== */
+.slideTicker{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(8px);
+  padding: 8px 0;
+  overflow: hidden;
+}
+
+.slideTicker__track{
+  display: inline-block;
+  width: max-content;
+  white-space: nowrap;
+  will-change: transform;
+
+  animation: ticker-ltr 28s linear infinite;
+  -webkit-animation: ticker-ltr 28s linear infinite;
+}
+
+.slideTicker__item{
+  display: inline-block;
+  padding: 0 22px;
+  font-weight: 1100;
+  color: var(--text);
+  opacity: .95;
+}
+
+/* حتى لا يغطي الشريط نص الكابشن، اجعل الكابشن فوق الشريط أو أضف padding */
+.slideBox .cap{
+  position: relative;
+  z-index: 3;
+  /* خيار 1: ارفع الكابشن فوق الشريط */
+  /* margin-bottom: 44px; */
+
+  /* خيار 2 (أنظف): اجعل الكابشن فوق الصورة، واترك الشريط أسفل الصورة فقط */
+}
+
+
+ /* ====== الشريط السفلي ====== */
+.ticker{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(8px);
+  padding: 10px 0;
+  overflow: hidden;
+}
+/* المسار المتحرك: اجعله بعرض النص الحقيقي */
+.ticker__track{
+  display: inline-block;
+  width: max-content;
+  white-space: nowrap;
+  will-change: transform;
+
+  animation: ticker-ltr 22s linear infinite;
+  -webkit-animation: ticker-ltr 22s linear infinite;
+}
+.ticker__item{
+  display:inline-block;
+  padding: 0 28px;
+  font-weight:1100;
+  color:var(--text);
+  opacity:.95;
+}
 
     /* Android TV: تصغير بسيط إن احتجت */
     body{ zoom: 0.90; }
@@ -212,14 +292,20 @@
 <body>
 <header>
   <h1>حمام القدس</h1>
-  <div class="sub">مرحبا بضيوفنا الكرام</div>
+  <div class="welcome">مرحباً بضيوفنا الكرام</div>
 </header>
 
 <div class="layout">
   <main class="content">
     <div class="section">
       <div class="section-title">
-        <span>الغرف</span>
+        <div class="titleTicker" aria-label="شريط متحرك">
+  <div class="titleTicker__track">
+    
+    <span class="titleTicker__item">**** سبحان الله والحمد لله ولا إله إلا الله والله أَكْبَرُ ولا حول ولا قوة إلا بالله العلي العظيم**** </span>
+  </div>
+</div>
+        <span class="titleTicker__item">*****اغتنم وقت الانتظار بكثرة الاستغفار**** </span>
         <span class="count" id="freeCount">0</span>
       </div>
 
@@ -228,23 +314,14 @@
   </main>
 </div>
 
-<!-- شريط متحرك للخدمات والأسعار -->
-<div class="ticker1" aria-label="الخدمات والأسعار">
-  <div class="ticker1__track" id="tickerTrack">
-    <span class="ticker1__item">
-      التسعير: (1) حمام شخص واحد 400 دج (2) أكثر من شخص عدد الأشخاص (في حدود اؤبعة اشخاص) × 400 دج (1–4) — بعد الساعة: كل ربع ساعة +100 دج لكل شخص — ساونا: حسب الطلب — تدليك: حسب الطلب
-    </span>
-  </div>
-</div>
-
   <!-- شريط متحرك للشركة المصنعة -->
 <div class="ticker" aria-label="الخدمات والأسعار">
   <div class="ticker__track" id="tickerTrack">
-    <span class="ticker__item">
-      شركة قيس المقر سطيف رفم الهاتف 0658756549 الفايسبوك 
-    </span>
+    <span class="ticker__item">شركة قيس المقر سطيف رقم الهاتف 0658756549 الفايسبوك</span>
+    <span class="ticker__item">شركة قيس المقر سطيف رقم الهاتف 0658756549 الفايسبوك</span>
   </div>
 </div>
+
 
 <!-- ===== Background Music for Android TV ===== -->
 <audio id="bgMusic" preload="auto" loop>
@@ -271,18 +348,41 @@
 
   // ===== Android TV Music: يبدأ بعد أول ضغطة =====
   const music = document.getElementById("bgMusic");
-  music.volume = 0.25;
-  let musicStarted = false;
+music.volume = 0.25;
 
-  async function startMusicOnce(){
-    if (musicStarted) return;
-    musicStarted = true;
-    try { await music.play(); }
-    catch(e){ musicStarted = false; }
+function showAudioStatus(msg){
+  let el = document.getElementById("audioStatus");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "audioStatus";
+    el.style.cssText = `
+      position:fixed;top:12px;left:12px;z-index:99999;
+      background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);
+      padding:8px 10px;border-radius:10px;font:14px/1.4 system-ui;
+      max-width: 70vw;
+    `;
+    document.body.appendChild(el);
   }
-  document.addEventListener("keydown", startMusicOnce);
-  document.addEventListener("click", startMusicOnce);
-  window.addEventListener("load", startMusicOnce);
+  el.textContent = msg;
+}
+
+let musicStarted = false;
+
+async function startMusicOnce(){
+  if (musicStarted) return;
+  musicStarted = true;
+
+  try{
+    music.load(); // مهم لبعض الأجهزة
+    await music.play();
+    showAudioStatus("Audio: playing ✅");
+  }catch(e){
+    musicStarted = false;
+    showAudioStatus(`Audio error: ${e?.name || "Unknown"} - ${e?.message || e}`);
+    console.error("Audio play failed:", e);
+  }
+}
+
 
   // ===== Firestore setup =====
   const app = initializeApp(firebaseConfig);
@@ -323,7 +423,7 @@
         badgeText:"فارغة",
         timerText:"—",
         timerClass:"normal",
-        meta:"لا يوجد استخدام حاليًا."
+        meta:"الغرفة متاحة حاليا"
       };
     }
 
@@ -358,40 +458,54 @@
     const card = document.createElement("div");
     card.className = "card roomCard";
     card.innerHTML = `
-      <div class="row">
-        <div class="room-title">غرفة ${room.id}</div>
-        <div class="badge ${disp.badgeClass}">${disp.badgeText}</div>
-      </div>
-      <div class="timer ${disp.timerClass}">${disp.timerText}</div>
-      <div class="meta">${disp.meta}</div>
-    `;
+  <div class="row">
+    <div class="room-title ar">غرفة رقم ${room.id}</div>
+    <div class="badge ${disp.badgeClass}">${disp.badgeText}</div>
+    <div class="room-title fr">Salle ${room.id}</div>
+  </div>
+  <div class="timer ${disp.timerClass}">${disp.timerText}</div>
+  <div class="meta">${disp.meta}</div>
+`;
+
     return card;
   }
 
   function makeSlideCard(totalRooms){
-    const card = document.createElement("div");
-    card.className = "slideCard";
-    card.innerHTML = `
-      <div class="section-title" style="margin:0 0 10px 0">
-        <span>خدماتنا</span>
-        <span>nos services</span>
+  const card = document.createElement("div");
+  card.className = "slideCard";
+  card.innerHTML = `
+    <div class="section-title" style="margin:0 0 10px 0">
+      <span>خدماتنا</span>
+      <span style="opacity:.6">—</span>
+      <span>nos services</span>
+    </div>
+
+    <div class="slideBox">
+      <img id="slideImg" src="./assets/sauna.jpg" alt="عرض صور" />
+      <div class="cap" id="slideCap">ساونا</div>
+
+      <!-- الشريط المتحرك داخل السلايد -->
+      <div class="slideTicker" aria-label="معلومات الخدمات والأسعار">
+        <div class="slideTicker__track">
+          <span class="slideTicker__item">
+            التسعير: (1) حمام شخص واحد 400 دج (2) أكثر من شخص عدد الأشخاص (في حدود أربعة أشخاص) × 400 دج (1–4) — بعد الساعة: كل ربع ساعة +100 دج لكل شخص — ساونا: حسب الطلب — تدليك: حسب الطلب
+          </span>
+        </div>
       </div>
-      <div class="slideBox">
-        <img id="slideImg" src="./assets/sauna.jpg" alt="عرض صور" />
-        <div class="cap" id="slideCap">ساونا</div>
-      </div>
-    `;
-    return card;
-  }
+    </div>
+  `;
+  return card;
+}
+
 
   function startInlineSlideshow(){
   // شغّل الـ interval مرة واحدة فقط
   if (window.__slideInterval) return;
 
   window.__slides = [
-    { src: "./assets/sauna.jpg",   cap: "ساونا" },
-    { src: "./assets/massage.jpg", cap: "تدليك" },
-    { src: "./assets/images1.jpeg",cap: "حمام القدس" }
+    { src: "./assets/sauna.jpg",   cap: "" },
+    { src: "./assets/massage.jpg", cap: "" },
+    { src: "./assets/images1.jpeg",cap: " " }
   ];
   window.__slideIndex = 0;
 
@@ -529,10 +643,4 @@ function updateTimersOnly(){
 </script>
 </body>
 </html>
-
-
-
-
-
-
 
