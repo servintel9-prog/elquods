@@ -174,6 +174,18 @@
       color:var(--text);
       opacity:.95;
     }
+    .ticker1{
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9999;
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(8px);
+      padding: 10px 0;
+      overflow: hidden;
+    }
     @keyframes ticker-ltr{
       0%   { transform: translateX(-100%); }
       100% { transform: translateX(100%); }
@@ -213,7 +225,7 @@
 </div>
 
   <!-- شريط متحرك للشركة المصنعة -->
-<div class="ticker" aria-label="الخدمات والأسعار">
+<div class="ticker1" aria-label="الخدمات والأسعار">
   <div class="ticker__track" id="tickerTrack">
     <span class="ticker__item">
       شركة الخدمات الذكية المقر سطيف رفم الهاتف 0658756549 الفايسبوك 
@@ -504,5 +516,6 @@ function updateTimersOnly(){
 </script>
 </body>
 </html>
+
 
 
