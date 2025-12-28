@@ -186,6 +186,19 @@
       padding: 10px 0;
       overflow: hidden;
     }
+    .ticker1__track{
+      width: 100%;
+      white-space: nowrap;
+      will-change: transform;
+      animation: ticker-ltr 18s linear infinite;
+    }
+    .ticker1__item{
+      display:inline-block;
+      padding: 0 28px;
+      font-weight:1100;
+      color:var(--text);
+      opacity:.95;
+    }
     @keyframes ticker-ltr{
       0%   { transform: translateX(-100%); }
       100% { transform: translateX(100%); }
@@ -216,16 +229,16 @@
 </div>
 
 <!-- شريط متحرك للخدمات والأسعار -->
-<div class="ticker" aria-label="الخدمات والأسعار">
-  <div class="ticker__track" id="tickerTrack">
-    <span class="ticker__item">
+<div class="ticker1" aria-label="الخدمات والأسعار">
+  <div class="ticker1__track" id="tickerTrack">
+    <span class="ticker1__item">
       التسعير: (1) حمام شخص واحد 400 دج (2) أكثر من شخص عدد الأشخاص (في حدود اؤبعة اشخاص) × 400 دج (1–4) — بعد الساعة: كل ربع ساعة +100 دج لكل شخص — ساونا: حسب الطلب — تدليك: حسب الطلب
     </span>
   </div>
 </div>
 
   <!-- شريط متحرك للشركة المصنعة -->
-<div class="ticker1" aria-label="الخدمات والأسعار">
+<div class="ticker" aria-label="الخدمات والأسعار">
   <div class="ticker__track" id="tickerTrack">
     <span class="ticker__item">
       شركة الذكية المقر سطيف رفم الهاتف 0658756549 الفايسبوك 
@@ -516,6 +529,7 @@ function updateTimersOnly(){
 </script>
 </body>
 </html>
+
 
 
 
