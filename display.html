@@ -286,6 +286,44 @@
 
     /* Android TV: تصغير بسيط إن احتجت */
     body{ zoom: 0.90; }
+
+    /* ===== Clock Widget ===== */
+#clockWidget{
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  right: auto;
+  z-index: 100000;
+
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow);
+
+  text-align: center;
+  direction: ltr; /* عرض الوقت بالأرقام بشكل صحيح */
+  min-width: 160px;
+}
+
+#clockTime{
+  font-variant-numeric: tabular-nums;
+  font-size: 28px;
+  font-weight: 1100;
+  color: var(--warn);
+  line-height: 1.1;
+}
+
+#clockDate{
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--muted);
+  direction: rtl; /* التاريخ بالعربية */
+  white-space: nowrap;
+}
+
   </style>
 </head>
 
@@ -295,6 +333,11 @@
   <div class="welcome">مرحباً بضيوفنا الكرام</div>
 </header>
 
+<div id="clockWidget" aria-label="الساعة والتاريخ">
+  <div id="clockTime">--:--:--</div>
+  <div id="clockDate"></div>
+</div>
+
 <div class="layout">
   <main class="content">
     <div class="section">
@@ -302,10 +345,10 @@
         <div class="titleTicker" aria-label="شريط متحرك">
   <div class="titleTicker__track">
     
-    <span class="titleTicker__item">**** سبحان الله والحمد لله ولا إله إلا الله والله أَكْبَرُ ولا حول ولا قوة إلا بالله العلي العظيم**** </span>
+    <span class="titleTicker__item">سبحان الله والحمد لله ولا إله إلا الله والله أَكْبَرُ ولا حول ولا قوة إلا بالله العلي العظيم </span>
   </div>
 </div>
-        <span class="titleTicker__item">*****اغتنم وقت الانتظار بكثرة الاستغفار**** </span>
+        <span class="titleTicker__item">اغتنم وقت الانتظار بكثرة الاستغفار</span>
         <span class="count" id="freeCount">0</span>
       </div>
 
@@ -397,6 +440,59 @@ async function startMusicOnce(){
 
   let uiBuilt = false;
 
+  // ===== Clock (Africa/Algiers) =====
+function safeFormat(formatter, date){
+  try { return formatter.format(date); } catch { return null; }
+}
+
+function startClock(){
+  const timeEl = document.getElementById("clockTime");
+  const dateEl = document.getElementById("clockDate");
+  if(!timeEl || !dateEl) return;
+
+  // قد لا يدعم بعض WebView خاصية timeZone؛ سنجرّب ثم نرجع لتوقيت الجهاز
+  let timeFmtTZ = null, dateFmtTZ = null;
+
+  try{
+    timeFmtTZ = new Intl.DateTimeFormat("ar-DZ", {
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false,
+      timeZone: "Africa/Algiers"
+    });
+    dateFmtTZ = new Intl.DateTimeFormat("ar-DZ", {
+      weekday: "long", year: "numeric", month: "long", day: "2-digit",
+      timeZone: "Africa/Algiers"
+    });
+  }catch(e){
+    // لا شيء: سنستخدم formatter بدون timeZone
+  }
+
+  const timeFmtLocal = new Intl.DateTimeFormat("ar-DZ", {
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+    hour12: false
+  });
+  const dateFmtLocal = new Intl.DateTimeFormat("ar-DZ", {
+    weekday: "long", year: "numeric", month: "long", day: "2-digit"
+  });
+
+  function tick(){
+    const now = new Date();
+
+    const t = (timeFmtTZ && safeFormat(timeFmtTZ, now)) || timeFmtLocal.format(now);
+    const d = (dateFmtTZ && safeFormat(dateFmtTZ, now)) || dateFmtLocal.format(now);
+
+    timeEl.textContent = t;
+    dateEl.textContent = d;
+  }
+
+  tick();
+  setInterval(tick, 1000);
+}
+
+// شغّل الساعة مرة واحدة
+startClock();
+
+
   function defaultRooms(){
     return Array.from({length:5}, (_,i)=>({ id:i+1, status:"FREE", startMs:null, persons:null }));
   }
@@ -421,7 +517,7 @@ async function startMusicOnce(){
       return {
         badgeClass:"free",
         badgeText:"فارغة",
-        timerText:"—",
+        timerText:"القاعة متوفرة",
         timerClass:"normal",
         meta:"الغرفة متاحة حاليا"
       };
